@@ -8,15 +8,15 @@ number: 0
 date: 23/10/23
 consensus: true
 v: 3
-area: SEC
-workgroup: TLS Working Group
+# area: SEC
+# workgroup: TLS Working Group
 venue:
-  group: TLS
-  type: Working Group
-  mail: tls@ietf.org
-  arch: https://mailarchive.ietf.org/arch/browse/tls/
-  github: jhoyla/draft-jhoyla-req-mtls-flag
-  latest: https://example.com/LATEST
+#  group: TLS
+#  type: Working Group
+#  mail: tls@ietf.org
+#  arch: https://mailarchive.ietf.org/arch/browse/tls/
+  github: "jhoyla/draft-jhoyla-req-mtls-flag"
+  latest: "https://jhoyla.github.io/draft-jhoyla-req-mtls-flag/draft-jhoyla-req-mtls-flag.html"
 
 author:
  -
