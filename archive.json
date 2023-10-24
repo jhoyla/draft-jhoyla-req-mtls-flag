@@ -1,0 +1,111 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2023-10-24T00:19:14.707247+00:00",
+  "repo": "jhoyla/draft-jhoyla-req-mtls-flag",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOKjmGVs5dd2do",
+      "title": "First draft",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/1",
+      "state": "MERGED",
+      "author": "jhoyla",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2023-10-22T15:12:56Z",
+      "updatedAt": "2023-10-22T15:13:24Z",
+      "baseRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "baseRefName": "main",
+      "baseRefOid": "c6a3ba36b4281cc3d98a5abab5ef7a39636d64e1",
+      "headRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "headRefName": "version00",
+      "headRefOid": "100998bc6ee53c8397c8432560b141a513b86355",
+      "closedAt": "2023-10-22T15:13:24Z",
+      "mergedAt": "2023-10-22T15:13:24Z",
+      "mergedBy": "jhoyla",
+      "mergeCommit": {
+        "oid": "b656c7b70cbed37b0719c914baeaaf5dff41810c"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 2,
+      "id": "PR_kwDOKjmGVs5dh17m",
+      "title": "First draft",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/2",
+      "state": "MERGED",
+      "author": "jhoyla",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2023-10-23T13:12:07Z",
+      "updatedAt": "2023-10-23T13:16:22Z",
+      "baseRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "baseRefName": "main",
+      "baseRefOid": "1610fe8ff3d1f07f59ea9ddfab986ec757382605",
+      "headRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "headRefName": "version00",
+      "headRefOid": "1610fe8ff3d1f07f59ea9ddfab986ec757382605",
+      "closedAt": "2023-10-23T13:16:17Z",
+      "mergedAt": "2023-10-23T13:16:17Z",
+      "mergedBy": "jhoyla",
+      "mergeCommit": {
+        "oid": "1610fe8ff3d1f07f59ea9ddfab986ec757382605"
+      },
+      "comments": [],
+      "reviews": []
+    }
+  ]
+}
