@@ -33,7 +33,7 @@ informative:
 
 Normally in TLS there is no way for the client to signal to the server that it
 has been configured with a certificate suitable for mTLS. This document defines
-a TLS Flag {{!I-D.ietf-tls-tlsflags}}
+a TLS Flag {{!I-D.ietf-tls-tlsflags}} that enables clients to provide this hint.
 
 
 --- middle
@@ -46,7 +46,9 @@ client, but might wish to authenticate a subset of them. In TLS 1.3 this may be
 done with post-handshake auth, however this adds an extra round-trip, and
 requires negotiation at the application layer. A client sending the request
 mTLS flag in the ClientHello allows the server to request authentication during
-the initial handshake only when it receives a hint the client supports it.
+the initial handshake only when it receives a hint the client supports it. This
+enables a number of use cases, for example allowing bots to authenticate
+themselves when mixed in with general traffic.
 
 # Conventions and Definitions
 
