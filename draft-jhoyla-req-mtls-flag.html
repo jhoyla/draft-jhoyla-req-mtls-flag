@@ -9,25 +9,25 @@
 <meta content="
        Normally in TLS there is no way for the client to signal to the server that it
 has been configured with a certificate suitable for mTLS. This document defines
-a TLS Flag  
+a TLS Flag   that enables clients to provide this hint. 
     " name="description">
-<meta content="xml2rfc 3.18.2" name="generator">
+<meta content="xml2rfc 3.19.4" name="generator">
 <meta content="0" name="rfc.number">
 <!-- Generator version information:
-  xml2rfc 3.18.2
+  xml2rfc 3.19.4
     Python 3.11.6
-    ConfigArgParse 1.5.3
+    ConfigArgParse 1.7
     google-i18n-address 3.1.0
     intervaltree 3.1.0
     Jinja2 3.1.2
     lxml 4.9.3
-    platformdirs 3.11.0
+    platformdirs 4.2.0
     pycountry 22.3.5
-    PyYAML 6.0
+    PyYAML 6.0.1
     requests 2.31.0
-    setuptools 67.7.2
+    setuptools 68.2.2
     six 1.16.0
-    wcwidth 0.2.8
+    wcwidth 0.2.13
 -->
 <link href="draft-jhoyla-req-mtls-flag.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1067,7 +1067,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">Normally in TLS there is no way for the client to signal to the server that it
 has been configured with a certificate suitable for mTLS. This document defines
-a TLS Flag <span>[<a href="#I-D.ietf-tls-tlsflags" class="cite xref">I-D.ietf-tls-tlsflags</a>]</span><a href="#section-abstract-1" class="pilcrow">¶</a></p>
+a TLS Flag <span>[<a href="#I-D.ietf-tls-tlsflags" class="cite xref">I-D.ietf-tls-tlsflags</a>]</span> that enables clients to provide this hint.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <div id="status-of-memo">
 <section id="section-boilerplate.1">
@@ -1155,7 +1155,9 @@ client, but might wish to authenticate a subset of them. In TLS 1.3 this may be
 done with post-handshake auth, however this adds an extra round-trip, and
 requires negotiation at the application layer. A client sending the request
 mTLS flag in the ClientHello allows the server to request authentication during
-the initial handshake only when it receives a hint the client supports it.<a href="#section-1-1" class="pilcrow">¶</a></p>
+the initial handshake only when it receives a hint the client supports it. This
+enables a number of use cases, for example allowing bots to authenticate
+themselves when mixed in with general traffic.<a href="#section-1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
