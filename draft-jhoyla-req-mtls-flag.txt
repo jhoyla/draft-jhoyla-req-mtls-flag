@@ -4,7 +4,7 @@
 
 Internet Engineering Task Force (IETF)                        J. Hoyland
 Request for Comments: 0                                       Cloudflare
-Category: Informational                                     October 2023
+Category: Informational                                    February 2025
 ISSN: 2070-1721
 
 
@@ -35,7 +35,7 @@ Status of This Memo
 
 Copyright Notice
 
-   Copyright (c) 2023 IETF Trust and the persons identified as the
+   Copyright (c) 2025 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -113,9 +113,9 @@ Table of Contents
 
    [I-D.ietf-tls-tlsflags]
               Nir, Y., "A Flags Extension for TLS 1.3", Work in
-              Progress, Internet-Draft, draft-ietf-tls-tlsflags-12, 23
-              July 2023, <https://datatracker.ietf.org/doc/html/draft-
-              ietf-tls-tlsflags-12>.
+              Progress, Internet-Draft, draft-ietf-tls-tlsflags-15, 15
+              March 2025, <https://datatracker.ietf.org/doc/html/draft-
+              ietf-tls-tlsflags-15>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
