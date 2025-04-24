@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-01-30T00:25:04.138047+00:00",
+  "timestamp": "2025-04-24T00:28:48.021952+00:00",
   "repo": "jhoyla/draft-jhoyla-req-mtls-flag",
   "labels": [
     {
@@ -49,7 +49,24 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 3,
+      "id": "I_kwDOKjmGVs6ufiKv",
+      "title": "Should this be \"request-mtls\" or should this be \"request-bot-auth\"?",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/3",
+      "state": "OPEN",
+      "author": "bob-beck",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "\"This enables a number of use cases, for example allowing bots to authenticate themselves when mixed in with general traffic.\"\n\nAfter some discussion with you and others seems to indicate that there may be an opinion that \"browsers shouldn't do this\"\n\nIf the intention is truly for \"bot-auth\" should this really be about only bot-auth - and perhaps include being opinionated about what the bot-auth is to perhaps simplify the resulting pki for this? (maybe not just any old X.509 certificate blob with path building etc,  but perhaps something more limited or even a raw public key to encourage dedicated trust stores for this purpose?)\n\nOr is the intention here to be a generic \"it's safe to send me a certificate request\" that browsers/clients/things-not-bots could possibly start using for certain things - and leaving \"bot-auth\" to have to disambiguate the cases (i.e. what trust store to use) on the server by other means if both are in use. \n",
+      "createdAt": "2025-03-18T07:49:25Z",
+      "updatedAt": "2025-03-18T07:49:25Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
   "pulls": [
     {
       "number": 1,
@@ -103,6 +120,60 @@
       "mergedBy": "jhoyla",
       "mergeCommit": {
         "oid": "1610fe8ff3d1f07f59ea9ddfab986ec757382605"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 4,
+      "id": "PR_kwDOKjmGVs6TcGtu",
+      "title": "Client MUST send empty Certificate message",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/4",
+      "state": "OPEN",
+      "author": "jhoyla",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Clients that receive `CertificateRequest`s in practice will terminate the connection in anticipation of a \"certificate_required\" alert, rather than sending an empty `Certificate` message, as specified in [RFC-8446, Section 4.4.2](https://www.rfc-editor.org/rfc/rfc8446#section-4.4.2).\r\nThis PR updates the draft to specify that the client MUST send an empty `Certificate` message, and SHOULD NOT terminate the connection in anticipation of a \"certificate_required\" alert.\r\nWe can't require a MUST NOT terminate the connection, as the client might want to terminate the connection for other, unrelated reasons.",
+      "createdAt": "2025-04-22T13:20:28Z",
+      "updatedAt": "2025-04-22T13:41:27Z",
+      "baseRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "baseRefName": "main",
+      "baseRefOid": "9885460cf74ddbd2ac1bfc70e21ddbc10ae797a7",
+      "headRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "headRefName": "jhoyla/empty-cert-message",
+      "headRefOid": "68f9f149aca1ef40a70c992f9539cfa7068ab0ac",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 5,
+      "id": "PR_kwDOKjmGVs6TcSiJ",
+      "title": "Update workflows",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/5",
+      "state": "MERGED",
+      "author": "jhoyla",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Update workflows to use correct / modern dependencies.",
+      "createdAt": "2025-04-22T13:39:32Z",
+      "updatedAt": "2025-04-22T13:40:29Z",
+      "baseRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "baseRefName": "main",
+      "baseRefOid": "1722581ff997d45dbc692a7f79f90a5f09879dfe",
+      "headRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "headRefName": "jhoyla/update-workflows",
+      "headRefOid": "d498e46a30cbab46f2115ff38c9df8c707f37feb",
+      "closedAt": "2025-04-22T13:40:29Z",
+      "mergedAt": "2025-04-22T13:40:28Z",
+      "mergedBy": "jhoyla",
+      "mergeCommit": {
+        "oid": "9885460cf74ddbd2ac1bfc70e21ddbc10ae797a7"
       },
       "comments": [],
       "reviews": []
