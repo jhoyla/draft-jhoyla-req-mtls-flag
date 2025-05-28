@@ -45,7 +45,7 @@ This document specifies a TLS Flag that allows a client to attempt to negotiate
 mutually authenticated TLS (in at least some cases). Sometimes a server does not
 want to authenticate every client, but might wish to authenticate a subset of
 them. In TLS 1.3 this may be done with post-handshake auth, however this adds an
-extra round-trip, and requires negotiation at the application layer.
+extra round trip, and requires negotiation at the application layer.
 
 The behaviour specified in {{?RFC8446}} for a client that receives a
 `CertificateRequest` that it cannot satisfy is to send an empty Certificate
@@ -91,6 +91,11 @@ wishes to accept the flag MUST echo the `request_mtls` flag in the
 `CertificateRequest` was because of the `request_mtls` flag and not due to some
 other policy. This allows clients to select certificates based on whether the
 server accepted the flag or not.
+
+A server MUST NOT set the `request_mtls` flag in the `CertificateRequest` unless
+it received the flag in the `ClientHello`. A client receiving the `request_mtls`
+flag that did not set it in the `ClientHello` MUST generate a fatal
+`illegal_parameter` alert.
 
 # Security Considerations
 
