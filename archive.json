@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-04-24T00:28:48.021952+00:00",
+  "timestamp": "2025-05-29T00:30:04.281077+00:00",
   "repo": "jhoyla/draft-jhoyla-req-mtls-flag",
   "labels": [
     {
@@ -136,19 +136,146 @@
       "labels": [],
       "body": "Clients that receive `CertificateRequest`s in practice will terminate the connection in anticipation of a \"certificate_required\" alert, rather than sending an empty `Certificate` message, as specified in [RFC-8446, Section 4.4.2](https://www.rfc-editor.org/rfc/rfc8446#section-4.4.2).\r\nThis PR updates the draft to specify that the client MUST send an empty `Certificate` message, and SHOULD NOT terminate the connection in anticipation of a \"certificate_required\" alert.\r\nWe can't require a MUST NOT terminate the connection, as the client might want to terminate the connection for other, unrelated reasons.",
       "createdAt": "2025-04-22T13:20:28Z",
-      "updatedAt": "2025-04-22T13:41:27Z",
+      "updatedAt": "2025-05-28T23:51:07Z",
       "baseRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
       "baseRefName": "main",
       "baseRefOid": "9885460cf74ddbd2ac1bfc70e21ddbc10ae797a7",
       "headRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
       "headRefName": "jhoyla/empty-cert-message",
-      "headRefOid": "68f9f149aca1ef40a70c992f9539cfa7068ab0ac",
+      "headRefOid": "03d2ea7a7e82739392e84f94fc6b873759ff5a5d",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
-      "reviews": []
+      "comments": [
+        {
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "body": "Following comments from @davidben, this has been changed to require the server to echo the flag in the `CertificateRequest` message. This allows the client to determine _why_ the server requested a certificate.",
+          "createdAt": "2025-05-27T16:59:21Z",
+          "updatedAt": "2025-05-27T16:59:21Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOKjmGVs6rLo26",
+          "commit": {
+            "abbreviatedOid": "18637e5"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-05-27T17:27:50Z",
+          "updatedAt": "2025-05-27T17:37:50Z",
+          "comments": [
+            {
+              "originalPosition": 37,
+              "body": "\r\n```suggestion\r\nextra round trip, and requires negotiation at the application layer.\r\n```",
+              "createdAt": "2025-05-27T17:27:50Z",
+              "updatedAt": "2025-05-27T17:37:50Z"
+            },
+            {
+              "originalPosition": 76,
+              "body": "It looks like the server can actually _offer_ TLS flags in CR: https://www.ietf.org/archive/id/draft-ietf-tls-tlsflags-15.html#section-3-4\r\n\r\nIn this case it might not be a good idea to ack the client's offer in CR as well.\r\n\r\nIn any case, I'm a little wary of this draft mandating where a server implementation chooses to acknowledge TLS Flags. The more flexible we can be, the less likely it is for this flag to complicate the implementation of other flags.",
+              "createdAt": "2025-05-27T17:37:48Z",
+              "updatedAt": "2025-05-27T17:37:50Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6rUkDs",
+          "commit": {
+            "abbreviatedOid": "18637e5"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-05-28T09:29:49Z",
+          "updatedAt": "2025-05-28T09:29:49Z",
+          "comments": [
+            {
+              "originalPosition": 76,
+              "body": "So I do think we need to specify one place, because otherwise you need logic to handle what to do if the flags disagree. Say the `ServerHello` doesn't set the flag, `EncryptedExtensions` does, and `CertificateRequest` doesn't. Is it an error? Does it being set anywhere => set? \r\n\r\nThe server can offer TLS Flags in `CertificateRequest`, but we can define the `request_mtls` flag to only be valid if it was offered in the `ClientHello`.",
+              "createdAt": "2025-05-28T09:29:49Z",
+              "updatedAt": "2025-05-28T09:29:49Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6rUowI",
+          "commit": {
+            "abbreviatedOid": "18637e5"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-05-28T09:36:18Z",
+          "updatedAt": "2025-05-28T09:36:19Z",
+          "comments": [
+            {
+              "originalPosition": 76,
+              "body": "Added new language to that effect.",
+              "createdAt": "2025-05-28T09:36:18Z",
+              "updatedAt": "2025-05-28T09:36:19Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6rdpnz",
+          "commit": {
+            "abbreviatedOid": "18637e5"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-05-28T23:21:17Z",
+          "updatedAt": "2025-05-28T23:21:17Z",
+          "comments": [
+            {
+              "originalPosition": 76,
+              "body": "I see. The TLS flags draft also requires us to specify which messages in which the flag may appear: https://datatracker.ietf.org/doc/html/draft-ietf-tls-tlsflags-15#section-4-4.3.1",
+              "createdAt": "2025-05-28T23:21:17Z",
+              "updatedAt": "2025-05-28T23:21:17Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6rdrA-",
+          "commit": {
+            "abbreviatedOid": "03d2ea7"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-05-28T23:27:23Z",
+          "updatedAt": "2025-05-28T23:51:07Z",
+          "comments": [
+            {
+              "originalPosition": 76,
+              "body": "How does the client handle the flag if it appears in a different message? Ideally the TLS Flags extension specifies the behavior in this case, but I'm not sure.",
+              "createdAt": "2025-05-28T23:27:23Z",
+              "updatedAt": "2025-05-28T23:51:07Z"
+            },
+            {
+              "originalPosition": 79,
+              "body": "Is this saying the server's acknowledgement (in the \"TLS Flags\" sense) is optional? If so, isn't the server's behavior here the same as if it doesn't implement the req mTLS flag?\r\n\r\nI think the phrase \"wishes to negotiate client authentication for another reason\" is throwing me. Am I right that you're just specifying behavior of servers that don't support this flag?\r\n",
+              "createdAt": "2025-05-28T23:32:54Z",
+              "updatedAt": "2025-05-28T23:51:07Z"
+            },
+            {
+              "originalPosition": 83,
+              "body": "The SHOULD NOT fills me with pause. As I understand it, the goal of this flag is to express to the server that the client will handle the CR in a specific way: respond with an (empty) CT. Is there a legitimate reason why a client might ignore this SHOULD NOT? ",
+              "createdAt": "2025-05-28T23:48:03Z",
+              "updatedAt": "2025-05-28T23:51:07Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 5,
