@@ -42,8 +42,8 @@ this hint.
 # Introduction
 
 This document specifies a TLS Flag {{!I-D.ietf-tls-tlsflags}} that allows a
-client to attempt to negotiate mutually authenticated TLS (in at least some
-cases). Sometimes a server does not want to authenticate every client, but
+client to prompt the server to request a client certificate during the
+handshake. Sometimes a server does not want to authenticate every client, but
 might wish to authenticate a subset of them. In TLS 1.3 this may be done with
 post-handshake authentication, however this adds an extra round trip, and
 requires negotiation at the application layer.
@@ -116,6 +116,9 @@ merely provides a hint that the client will handle the request gracefully.
 Because the server acknowledges the flag in the `CertificateRequest` the client
 can always be sure whether a `CertificateRequest` was triggered by
 `request_client_auth` or not.
+
+TODO: Discuss security considerations related to a flag that changes which
+trust anchors are offered and how to handle/authorise application data.
 
 # IANA Considerations
 
