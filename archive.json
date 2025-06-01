@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-05-29T00:30:04.281077+00:00",
+  "timestamp": "2025-06-01T00:37:40.337869+00:00",
   "repo": "jhoyla/draft-jhoyla-req-mtls-flag",
   "labels": [
     {
@@ -63,6 +63,78 @@
       "body": "\"This enables a number of use cases, for example allowing bots to authenticate themselves when mixed in with general traffic.\"\n\nAfter some discussion with you and others seems to indicate that there may be an opinion that \"browsers shouldn't do this\"\n\nIf the intention is truly for \"bot-auth\" should this really be about only bot-auth - and perhaps include being opinionated about what the bot-auth is to perhaps simplify the resulting pki for this? (maybe not just any old X.509 certificate blob with path building etc,  but perhaps something more limited or even a raw public key to encourage dedicated trust stores for this purpose?)\n\nOr is the intention here to be a generic \"it's safe to send me a certificate request\" that browsers/clients/things-not-bots could possibly start using for certain things - and leaving \"bot-auth\" to have to disambiguate the cases (i.e. what trust store to use) on the server by other means if both are in use. \n",
       "createdAt": "2025-03-18T07:49:25Z",
       "updatedAt": "2025-03-18T07:49:25Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 6,
+      "id": "I_kwDOKjmGVs64-a8l",
+      "title": "Security Considerations: Address risk of making authentication logic more complex",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/6",
+      "state": "OPEN",
+      "author": "cjpatton",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This is interesting because even if the flag on its own has no security impact, the use case we intend to support here -- web bot auth -- certainly does. Namely, we have to override the logic the server uses to decide whether to send a CertificateRequest, how to select a trust anchor to validate the Certificate, and how to handle application data. We don't want to authorize HTTP requests from a crawler that would otherwise require a different client identity.\r\n\r\nGiven the WG feedback so far, I think we'll need to discuss this here. If you'd rather do it in a separate PR, then feel free to just leave a TODO here.\r\n\r\n_Originally posted by @cjpatton in https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/4#discussion_r2114816776_\r\n            ",
+      "createdAt": "2025-05-30T14:15:26Z",
+      "updatedAt": "2025-05-30T16:21:08Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Note: The scope of this issue might change if (1) we decide to scope the draft to \"request bot auth\" (#3) and (2) we decide the draft itself should manage the complexity of authentication logic, e.g., by partitioning the set of trust anchors and spelling out requirements for CAs.",
+          "createdAt": "2025-05-30T16:02:44Z",
+          "updatedAt": "2025-05-30T16:02:44Z"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "id": "I_kwDOKjmGVs64_ezi",
+      "title": "Compare to using HTTP Signatures for bot auth",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/7",
+      "state": "OPEN",
+      "author": "cjpatton",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "We're planning to use HTTP Signatures (RFC 9241) for bot authentication: https://github.com/thibmeu/http-message-signatures-directory. This might be inappropriate for some use cases or deployment scenarios. We should help readers decide whether request client auth is more appropriate.\n\nSpecifically, the draft should spell out the potential efficiency issues and security risks of using HTTP signatures for bot authentication and how these might be addressed with authentication at the TLS level.",
+      "createdAt": "2025-05-30T16:09:24Z",
+      "updatedAt": "2025-05-30T16:09:24Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 8,
+      "id": "I_kwDOKjmGVs64_fy8",
+      "title": "Add reference to draft-meunier-web-bot-auth-architecture",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/8",
+      "state": "OPEN",
+      "author": "cjpatton",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The motivation for this draft is primarily to solve the use cases described in https://datatracker.ietf.org/doc/draft-meunier-web-bot-auth-architecture/. We should add an informational reference to this to the intro.\n\nMore generally, we want to enumerate the use cases which this draft might solve for.",
+      "createdAt": "2025-05-30T16:11:34Z",
+      "updatedAt": "2025-05-30T16:20:50Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 9,
+      "id": "I_kwDOKjmGVs64_nlH",
+      "title": "Ensure the flag is safe to enable inadvertently",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/9",
+      "state": "OPEN",
+      "author": "cjpatton",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "One concern discussed at IETF 123 is that non-bot clients might propose the flag inadvertently. This is in part a question about proper documentation, but we should also take seriously the question of how to make this safe.\n\nOnce we land #4, the protocol will be something like this: if the client proposes the flag and the server acknowledges it, then the server MUST send CertificateRequest with the acknowledgement.\n\nThe risk seems fairly minimal for this protocol, since the client now knows what code path the server has to selected (client auth with or without the flag). Still, we should play out what might go wrong on the client and side and how an implementation can ensure it does the right thing.",
+      "createdAt": "2025-05-30T16:28:37Z",
+      "updatedAt": "2025-05-30T16:28:37Z",
       "closedAt": null,
       "comments": []
     }
@@ -136,13 +208,13 @@
       "labels": [],
       "body": "Clients that receive `CertificateRequest`s in practice will terminate the connection in anticipation of a \"certificate_required\" alert, rather than sending an empty `Certificate` message, as specified in [RFC-8446, Section 4.4.2](https://www.rfc-editor.org/rfc/rfc8446#section-4.4.2).\r\nThis PR updates the draft to specify that the client MUST send an empty `Certificate` message, and SHOULD NOT terminate the connection in anticipation of a \"certificate_required\" alert.\r\nWe can't require a MUST NOT terminate the connection, as the client might want to terminate the connection for other, unrelated reasons.",
       "createdAt": "2025-04-22T13:20:28Z",
-      "updatedAt": "2025-05-28T23:51:07Z",
+      "updatedAt": "2025-05-30T14:26:17Z",
       "baseRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
       "baseRefName": "main",
       "baseRefOid": "9885460cf74ddbd2ac1bfc70e21ddbc10ae797a7",
       "headRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
       "headRefName": "jhoyla/empty-cert-message",
-      "headRefOid": "03d2ea7a7e82739392e84f94fc6b873759ff5a5d",
+      "headRefOid": "3e5b34c7d8e072683cc328a359358b6eb043ddd0",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -163,7 +235,7 @@
             "abbreviatedOid": "18637e5"
           },
           "author": "cjpatton",
-          "authorAssociation": "NONE",
+          "authorAssociation": "COLLABORATOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2025-05-27T17:27:50Z",
@@ -229,7 +301,7 @@
             "abbreviatedOid": "18637e5"
           },
           "author": "cjpatton",
-          "authorAssociation": "NONE",
+          "authorAssociation": "COLLABORATOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2025-05-28T23:21:17Z",
@@ -249,7 +321,7 @@
             "abbreviatedOid": "03d2ea7"
           },
           "author": "cjpatton",
-          "authorAssociation": "NONE",
+          "authorAssociation": "COLLABORATOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2025-05-28T23:27:23Z",
@@ -274,6 +346,211 @@
               "updatedAt": "2025-05-28T23:51:07Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6rhT6e",
+          "commit": {
+            "abbreviatedOid": "18637e5"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-05-29T09:15:38Z",
+          "updatedAt": "2025-05-29T09:15:38Z",
+          "comments": [
+            {
+              "originalPosition": 79,
+              "body": "No I'm specifying the behaviour of a server that always asks for a client cert, irrespective of this flag (or possibly is asking for a client cert because of a different flag). If the server always asks for a cert, then the reason it's asking for a cert is _not_ the presence (or absence) of the flag.\r\n\r\nIt's important to specify this behaviour because if the server supports a different TLS Flag (say 82), and has support req mTLS but is not  configured to use it, it needs to know whether to set the flag or not.",
+              "createdAt": "2025-05-29T09:15:38Z",
+              "updatedAt": "2025-05-29T09:15:38Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6rhYWJ",
+          "commit": {
+            "abbreviatedOid": "18637e5"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-05-29T09:23:04Z",
+          "updatedAt": "2025-05-29T09:23:04Z",
+          "comments": [
+            {
+              "originalPosition": 76,
+              "body": "IIUC the behaviour specified in the TLS Flags draft is a fatal `illegal_parameter` alert. \r\n> An endpoint that receives an unsolicited flag in another message (HRR, SH, EE, or CT) MUST generate a fatal illegal_parameter alert.\r\n\r\nhttps://datatracker.ietf.org/doc/html/draft-ietf-tls-tlsflags-15#section-3-6\r\nI'll add text making this explicit.",
+              "createdAt": "2025-05-29T09:23:04Z",
+              "updatedAt": "2025-05-29T09:23:15Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6rhbBn",
+          "commit": {
+            "abbreviatedOid": "18637e5"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-05-29T09:27:53Z",
+          "updatedAt": "2025-05-29T09:27:53Z",
+          "comments": [
+            {
+              "originalPosition": 83,
+              "body": "Yes. If the server sets the `certificate_authorities` extension, and only lists authorities that the client doesn't support, ditto with `signature_algorithms`. Also, the client may wish to terminate the connection for another reason (e.g. server cert didn't verify), so we shouldn't require them to continue.",
+              "createdAt": "2025-05-29T09:27:53Z",
+              "updatedAt": "2025-05-29T09:27:53Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6rhfjx",
+          "commit": {
+            "abbreviatedOid": "18637e5"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-05-29T09:35:47Z",
+          "updatedAt": "2025-05-29T09:35:47Z",
+          "comments": [
+            {
+              "originalPosition": 76,
+              "body": "This is specified on line 115:\r\n```diff\r\n-* Message shall be CH\r\n+* Message shall be CH, CR\r\n```\r\nStanding for `ClientHello` and `CertificateRequest` respectively.",
+              "createdAt": "2025-05-29T09:35:47Z",
+              "updatedAt": "2025-05-29T09:35:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6rk0A7",
+          "commit": {
+            "abbreviatedOid": "18637e5"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-05-29T14:42:41Z",
+          "updatedAt": "2025-05-29T14:42:41Z",
+          "comments": [
+            {
+              "originalPosition": 76,
+              "body": "Yes I see that . I would have resolved this thread but am unable to.",
+              "createdAt": "2025-05-29T14:42:41Z",
+              "updatedAt": "2025-05-29T14:42:41Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6rpPSW",
+          "commit": {
+            "abbreviatedOid": "ea85945"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-05-29T22:02:45Z",
+          "updatedAt": "2025-05-29T22:06:11Z",
+          "comments": [
+            {
+              "originalPosition": 113,
+              "body": "This is interesting because even if the flag on its own has no security impact, the use case we intend to support here -- web bot auth -- certainly does. Namely, we have to override the logic the server uses to decide whether to send a CertificateRequest, how to select a trust anchor to validate the Certificate, and how to handle application data. We don't want to authorize HTTP requests from a crawler that would otherwise require a different client identity.\r\n\r\nGiven the WG feedback so far, I think we'll need to discuss this here. If you'd rather do it in a separate PR, then feel free to just leave a TODO here.",
+              "createdAt": "2025-05-29T22:02:45Z",
+              "updatedAt": "2025-05-29T22:06:11Z"
+            },
+            {
+              "originalPosition": 40,
+              "body": "Along the lines of avoiding the term \"request mutual TLS\", we might rewrite this as\r\n```suggestion\r\nclient to prompt the server to request a certificate during the handshake. Sometimes a server does not want to authenticate every client, but\r\n```",
+              "createdAt": "2025-05-29T22:03:50Z",
+              "updatedAt": "2025-05-29T22:06:11Z"
+            },
+            {
+              "originalPosition": 62,
+              "body": "A bit nit-picky, but: what does \"directly available\" mean? A bot might still need to select a cert based on the contents of the CR.",
+              "createdAt": "2025-05-29T22:05:58Z",
+              "updatedAt": "2025-05-29T22:06:11Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6rtPWa",
+          "commit": {
+            "abbreviatedOid": "ea85945"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-05-30T09:42:26Z",
+          "updatedAt": "2025-05-30T09:42:26Z",
+          "comments": [
+            {
+              "originalPosition": 62,
+              "body": "The goal is to make it clear that you shouldn't set this flag if you aren't certain you have at least one certificate available. You don't want the client to start trying to enumerate keys on a smartcard or prompting the user for a PEM file. This is only supposed to be used if you already know what certificate(s) you have available.",
+              "createdAt": "2025-05-30T09:42:26Z",
+              "updatedAt": "2025-05-30T09:42:26Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6rtRTZ",
+          "commit": {
+            "abbreviatedOid": "ea85945"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-05-30T09:45:28Z",
+          "updatedAt": "2025-05-30T09:45:28Z",
+          "comments": [
+            {
+              "originalPosition": 113,
+              "body": "Let's move that to a different PR. What I mean here is that, from a formal methods perspective, this flag is a no-op. The server is always allowed to send a `CertificateRequest`, set CAs, and handle application data in whatever way it likes without affecting the security of the TLS handshake.",
+              "createdAt": "2025-05-30T09:45:28Z",
+              "updatedAt": "2025-05-30T09:45:28Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6rwDkU",
+          "commit": {
+            "abbreviatedOid": "ea85945"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-05-30T14:16:12Z",
+          "updatedAt": "2025-05-30T14:16:12Z",
+          "comments": [
+            {
+              "originalPosition": 113,
+              "body": "Filed https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/6.",
+              "createdAt": "2025-05-30T14:16:12Z",
+              "updatedAt": "2025-05-30T14:16:12Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6rwLYH",
+          "commit": {
+            "abbreviatedOid": "3e5b34c"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "I don't think this addresses everything, but it's a step in the right direction. I say we merge and iterate.",
+          "createdAt": "2025-05-30T14:26:17Z",
+          "updatedAt": "2025-05-30T14:26:17Z",
+          "comments": []
         }
       ]
     },
