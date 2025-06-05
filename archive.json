@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-01T00:37:40.337869+00:00",
+  "timestamp": "2025-06-05T00:30:18.685448+00:00",
   "repo": "jhoyla/draft-jhoyla-req-mtls-flag",
   "labels": [
     {
@@ -135,6 +135,22 @@
       "body": "One concern discussed at IETF 123 is that non-bot clients might propose the flag inadvertently. This is in part a question about proper documentation, but we should also take seriously the question of how to make this safe.\n\nOnce we land #4, the protocol will be something like this: if the client proposes the flag and the server acknowledges it, then the server MUST send CertificateRequest with the acknowledgement.\n\nThe risk seems fairly minimal for this protocol, since the client now knows what code path the server has to selected (client auth with or without the flag). Still, we should play out what might go wrong on the client and side and how an implementation can ensure it does the right thing.",
       "createdAt": "2025-05-30T16:28:37Z",
       "updatedAt": "2025-05-30T16:28:37Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 10,
+      "id": "I_kwDOKjmGVs65374k",
+      "title": "Compare to concealed auth for HTTP",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/10",
+      "state": "OPEN",
+      "author": "cjpatton",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Could we use https://datatracker.ietf.org/doc/rfc9729/ to bind requests to the TLS channel? Does this work in practice for our main case of bot auth?",
+      "createdAt": "2025-06-04T16:41:53Z",
+      "updatedAt": "2025-06-04T16:41:53Z",
       "closedAt": null,
       "comments": []
     }
