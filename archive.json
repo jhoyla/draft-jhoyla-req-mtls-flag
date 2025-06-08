@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-05T00:30:18.685448+00:00",
+  "timestamp": "2025-06-08T00:34:00.618534+00:00",
   "repo": "jhoyla/draft-jhoyla-req-mtls-flag",
   "labels": [
     {
@@ -150,9 +150,17 @@
       "labels": [],
       "body": "Could we use https://datatracker.ietf.org/doc/rfc9729/ to bind requests to the TLS channel? Does this work in practice for our main case of bot auth?",
       "createdAt": "2025-06-04T16:41:53Z",
-      "updatedAt": "2025-06-04T16:41:53Z",
+      "updatedAt": "2025-06-05T10:07:08Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "body": "We tried this initially, but it doesn't play nicely with connection pooling. We tried several different HTTP libraries, and we found that most require you to create a request and dispatch it to the connection pool, whereupon the pool decides which connection it will go on. In some libraries/scenarios the connection isn't even established until the request has been dispatched. This makes constructing the signature very difficult because you can't reliably get the appropriate TLS exporter. At small scale it's possible to manage in a few ways, i.e. not using connection pooling, using callbacks to modify the request after the connection has been selected, or sending dummy get requests with the appropriate header on every connection that gets added to the pool, but each of these has very significant drawbacks when you scale past a few connections. ",
+          "createdAt": "2025-06-05T10:07:07Z",
+          "updatedAt": "2025-06-05T10:07:07Z"
+        }
+      ]
     }
   ],
   "pulls": [
