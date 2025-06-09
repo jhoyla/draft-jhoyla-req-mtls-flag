@@ -4,12 +4,13 @@
 <meta charset="utf-8">
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
-<title>RFC 0: TLS Flag - Request mTLS</title>
+<title>RFC 0: TLS Flag - Request Client Auth</title>
 <meta content="Jonathan Hoyland" name="author">
 <meta content="
        Normally in TLS there is no way for the client to signal to the server that it
-has been configured with a certificate suitable for mTLS. This document defines
-a TLS Flag   that enables clients to provide this hint. 
+supports client authentication and will handle a  CertificateRequest 
+gracefully. This document defines a TLS Flag that enables clients to provide
+this hint. 
     " name="description">
 <meta content="xml2rfc 3.28.1" name="generator">
 <meta content="0" name="rfc.number">
@@ -20,12 +21,12 @@ a TLS Flag   that enables clients to provide this hint.
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.6
-    lxml 5.3.0
-    platformdirs 4.3.7
+    lxml 5.3.1
+    platformdirs 4.3.8
     pycountry 24.6.1
     PyYAML 6.0.2
     requests 2.32.3
-    setuptools 70.3.0
+    setuptools 80.9.0
     wcwidth 0.2.13
 -->
 <link href="draft-jhoyla-req-mtls-flag.xml" rel="alternate" type="application/rfc+xml">
@@ -1047,8 +1048,8 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <table class="ears">
 <thead><tr>
 <td class="left">RFC 0</td>
-<td class="center">TLS Flag - Request mTLS</td>
-<td class="right">February 2025</td>
+<td class="center">TLS Flag - Request Client Auth</td>
+<td class="right">May 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Hoyland</td>
@@ -1067,7 +1068,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="category">Informational</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-02" class="published">February 2025</time>
+<time datetime="2025-05" class="published">May 2025</time>
     </dd>
 <dt class="label-issn">ISSN:</dt>
 <dd class="issn">2070-1721</dd>
@@ -1081,12 +1082,13 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </dl>
 </div>
 <h1 id="rfcnum">RFC 0</h1>
-<h1 id="title">TLS Flag - Request mTLS</h1>
+<h1 id="title">TLS Flag - Request Client Auth</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">Normally in TLS there is no way for the client to signal to the server that it
-has been configured with a certificate suitable for mTLS. This document defines
-a TLS Flag <span>[<a href="#I-D.ietf-tls-tlsflags" class="cite xref">I-D.ietf-tls-tlsflags</a>]</span> that enables clients to provide this hint.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+supports client authentication and will handle a <code>CertificateRequest</code>
+gracefully. This document defines a TLS Flag that enables clients to provide
+this hint.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <div id="status-of-memo">
 <section id="section-boilerplate.1">
@@ -1151,7 +1153,15 @@ a TLS Flag <span>[<a href="#I-D.ietf-tls-tlsflags" class="cite xref">I-D.ietf-tl
             <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
             <p id="section-toc.1-1.7.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
@@ -1168,15 +1178,30 @@ a TLS Flag <span>[<a href="#I-D.ietf-tls-tlsflags" class="cite xref">I-D.ietf-tl
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">This document specifies a TLS Flag that indicates to the server that the client
-supports mTLS. Sometimes a server does not want to negotiate mTLS with every
-client, but might wish to authenticate a subset of them. In TLS 1.3 this may be
-done with post-handshake auth, however this adds an extra round-trip, and
-requires negotiation at the application layer. A client sending the request
-mTLS flag in the ClientHello allows the server to request authentication during
-the initial handshake only when it receives a hint the client supports it. This
-enables a number of use cases, for example allowing bots to authenticate
-themselves when mixed in with general traffic.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-1">This document specifies a TLS Flag <span>[<a href="#I-D.ietf-tls-tlsflags" class="cite xref">I-D.ietf-tls-tlsflags</a>]</span> that allows a
+client to prompt the server to request a client certificate during the
+handshake. Sometimes a server does not want to authenticate every client, but
+might wish to authenticate a subset of them. In TLS 1.3 this may be done with
+post-handshake authentication, however this adds an extra round trip, and
+requires negotiation at the application layer.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">The behaviour specified in <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span> for a client that receives a
+<code>CertificateRequest</code> that it cannot satisfy is to send an empty Certificate
+message followed by a <code>Finished</code> message. However in practice many clients
+simply terminate the connection in anticipation of a "certificate_required"
+alert.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">This behaviour makes it difficult for servers to send <code>CertificateRequest</code>
+messages in the wild. A client sending the <code>request_client_auth</code> flag in the
+<code>ClientHello</code> allows the server to request authentication during the initial
+handshake only when it receives a hint the client will handle the request
+without terminating the connection, and, if unable to authenticate, by sending
+an empty certificate message, per <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>], <a href="https://rfc-editor.org/rfc/rfc8446#section-4.4.2" class="relref">Section 4.4.2</a></span>. This enables a
+number of use cases, for example allowing bots to authenticate themselves when
+mixed in with general traffic.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">This flag is intended to be used by clients sending automated traffic, not
+those that are directly operated by (human) users. Clients that set this flag
+<span class="bcp14">SHOULD</span> only do so when a client certificate is directly available to them, and
+<span class="bcp14">MUST NOT</span> prompt the user or take actions that would prompt the user for example
+trying to read certificates from off-board devices such as smart cards.<a href="#section-1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1195,7 +1220,35 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
       <h2 id="name-flag-specification">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-flag-specification" class="section-name selfRef">Flag specification</a>
       </h2>
-<p id="section-3-1">A server receiving this flag <span class="bcp14">MAY</span> send a CertificateRequest message.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-1">The <code>request_client_auth</code> flag is sent by the client in the <code>ClientHello</code>
+message, and, if accepted by the server, acknowledged in the server's
+<code>CertificateRequest</code> message. A server that receives this flag and wishes to
+accept the extension <span class="bcp14">MUST</span> send a <code>CertificateRequest</code> message with the TLS
+Flags extension, and with the <code>request_client_auth</code> flag set. The server <span class="bcp14">MAY</span>
+send a <code>CertificateRequest</code> message without the <code>request_client_auth</code> flag set
+if it wishes to negotiate client authentication for another reason. This could
+occur if the server is configured to always request a client certificate. The
+client sending this flag <span class="bcp14">MUST</span> send a <code>Certificate</code> message if it receives a
+<code>CertificateRequest</code> with the <code>request_client_auth</code> flag set, even if said
+<code>Certificate</code> message is empty, and <span class="bcp14">SHOULD NOT</span> preemptively terminate the
+connection anticipating a "certificate_required" alert. Appropriate cases where
+a client would preemptively terminate the connection include where the
+<code>CertificateRequest</code> includes a <code>certificate_authorities</code> extension or
+<code>signature_algorithms</code> extension that the client cannot satisfy.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">A server receiving the <code>request_client_auth</code> flag in a <code>ClientHello</code> message
+that wishes to accept the flag <span class="bcp14">MUST</span> echo the <code>request_client_auth</code> flag in the
+<code>CertificateRequest</code> message. This informs the client that the reason for the
+<code>CertificateRequest</code> was because of the <code>request_client_auth</code> flag and not due
+to some other policy. This allows clients to select certificates based on
+whether the server accepted the flag or not.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">A server <span class="bcp14">MUST NOT</span> set the <code>request_client_auth</code> flag in the
+<code>CertificateRequest</code> unless it received the flag in the <code>ClientHello</code>. A client
+receiving the <code>request_client_auth</code> flag that did not set it in the
+<code>ClientHello</code> <span class="bcp14">MUST</span> generate a fatal <code>illegal_parameter</code> alert.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-4">A client that receives this flag in any message other than <code>CertificateRequest</code>
+        <span class="bcp14">MUST</span> terminate the connection with a fatal <code>illegal_parameter</code> alert. Similarly
+a server that receives this flag in any message other than <code>ClientHello</code> <span class="bcp14">MUST</span>
+terminate the connection with a fatal <code>illegal_parameter</code> alert.<a href="#section-3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
@@ -1203,11 +1256,14 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
       <h2 id="name-security-considerations">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-4-1">This flag should have no effect on the security of TLS, as the server may always
-send a CertificateRequest message during the handshake. This flag merely
-provides a hint that the client will be able to fulfil the request. If the
-client sets this flag but then fails to provide a certificate the server <span class="bcp14">MAY</span>
-terminate the connection with a bad_certificate error.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-1">This flag should have no effect on the security of TLS, as the server may
+always send a <code>CertificateRequest</code> message during the handshake. This flag
+merely provides a hint that the client will handle the request gracefully.
+Because the server acknowledges the flag in the <code>CertificateRequest</code> the client
+can always be sure whether a <code>CertificateRequest</code> was triggered by
+<code>request_client_auth</code> or not.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">TODO: Discuss security considerations related to a flag that changes which
+trust anchors are offered and how to handle/authorise application data.<a href="#section-4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
@@ -1215,8 +1271,8 @@ terminate the connection with a bad_certificate error.<a href="#section-4-1" cla
       <h2 id="name-iana-considerations">
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-5-1">This document requests IANA to add an entry to the TLS Flags registry in the TLS
-namespace with the following values:<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-1">This document requests IANA to add an entry to the TLS Flags registry in the
+TLS namespace with the following values:<a href="#section-5-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5-2.1">
           <p id="section-5-2.1.1">Value shall be TBD<a href="#section-5-2.1.1" class="pilcrow">¶</a></p>
@@ -1225,7 +1281,7 @@ namespace with the following values:<a href="#section-5-1" class="pilcrow">¶</a
           <p id="section-5-2.2.1">Flag Name shall be request_mtls.<a href="#section-5-2.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-5-2.3">
-          <p id="section-5-2.3.1">Message shall be CH<a href="#section-5-2.3.1" class="pilcrow">¶</a></p>
+          <p id="section-5-2.3.1">Message shall be CH, CR<a href="#section-5-2.3.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-5-2.4">
           <p id="section-5-2.4.1">Recommended shall be set to no (N)<a href="#section-5-2.4.1" class="pilcrow">¶</a></p>
@@ -1236,25 +1292,45 @@ namespace with the following values:<a href="#section-5-1" class="pilcrow">¶</a
       </ul>
 </section>
 </div>
-<div id="sec-normative-references">
+<div id="sec-combined-references">
 <section id="section-6">
-      <h2 id="name-normative-references">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+      <h2 id="name-references">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
+<div id="sec-normative-references">
+<section id="section-6.1">
+        <h3 id="name-normative-references">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
 <dl class="references">
 <dt id="I-D.ietf-tls-tlsflags">[I-D.ietf-tls-tlsflags]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Nir, Y.</span>, <span class="refTitle">"A Flags Extension for TLS 1.3"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tls-tlsflags-15</span>, <time datetime="2025-03-15" class="refDate">15 March 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-tlsflags-15">https://datatracker.ietf.org/doc/html/draft-ietf-tls-tlsflags-15</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
-    <dd>
+      <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-6.2">
+        <h3 id="name-informative-references">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="RFC8446">[RFC8446]</dt>
+      <dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8446">https://www.rfc-editor.org/rfc/rfc8446</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
 </section>
 </div>
 <div id="acknowledgments">
