@@ -49,7 +49,7 @@ post-handshake authentication, however this adds an extra round trip, and
 requires negotiation at the application layer.
 
 The behaviour specified in {{?RFC8446}} for a client that receives a
-`CertificateRequest` that it cannot satisfy is to send an empty Certificate
+`CertificateRequest` that it cannot satisfy is to send an empty `Certificate`
 message followed by a `Finished` message. However in practice many clients
 simply terminate the connection in anticipation of a "certificate_required"
 alert.
@@ -59,7 +59,7 @@ messages in the wild. A client sending the `request_client_auth` flag in the
 `ClientHello` allows the server to request authentication during the initial
 handshake only when it receives a hint the client will handle the request
 without terminating the connection, and, if unable to authenticate, by sending
-an empty certificate message, per {{?RFC8446, Section 4.4.2}}. This enables a
+an empty `Certificate` message, per {{?RFC8446, Section 4.4.2}}. This enables a
 number of use cases, for example allowing bots to authenticate themselves when
 mixed in with general traffic.
 
@@ -79,24 +79,24 @@ The `request_client_auth` flag is sent by the client in the `ClientHello`
 message, and, if accepted by the server, acknowledged in the server's
 `CertificateRequest` message. A server that receives this flag and wishes to
 accept the extension MUST send a `CertificateRequest` message with the TLS
-Flags extension, and with the `request_client_auth` flag set. The server MAY
-send a `CertificateRequest` message without the `request_client_auth` flag set
-if it wishes to negotiate client authentication for another reason. This could
-occur if the server is configured to always request a client certificate. The
-client sending this flag MUST send a `Certificate` message if it receives a
+Flags extension, and with the `request_client_auth` flag set. This informs the
+client that the reason for the `CertificateRequest` was because of the
+`request_client_auth` flag and not due to some other policy. This allows
+clients to select certificates based on whether the server accepted the flag or
+not.
+
+The server MAY send a `CertificateRequest` message without the
+`request_client_auth` flag set if it wishes to negotiate client authentication
+for another reason. This could occur if, for example, the server is configured
+to always request a client certificate.
+
+The client sending this flag MUST send a `Certificate` message if it receives a
 `CertificateRequest` with the `request_client_auth` flag set, even if said
 `Certificate` message is empty, and SHOULD NOT preemptively terminate the
 connection anticipating a "certificate_required" alert. Appropriate cases where
 a client would preemptively terminate the connection include where the
 `CertificateRequest` includes a `certificate_authorities` extension or
 `signature_algorithms` extension that the client cannot satisfy.
-
-A server receiving the `request_client_auth` flag in a `ClientHello` message
-that wishes to accept the flag MUST echo the `request_client_auth` flag in the
-`CertificateRequest` message. This informs the client that the reason for the
-`CertificateRequest` was because of the `request_client_auth` flag and not due
-to some other policy. This allows clients to select certificates based on
-whether the server accepted the flag or not.
 
 A server MUST NOT set the `request_client_auth` flag in the
 `CertificateRequest` unless it received the flag in the `ClientHello`. A client
