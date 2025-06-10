@@ -1240,14 +1240,14 @@ problem (see <a href="#alternative-approaches" class="auto internal xref">Append
 several desirable features for this use case. [[TODO: Address issue #12 and
 add a reference here.]]<a href="#section-1-6" class="pilcrow">¶</a></p>
 <p id="section-1-7">The mechanism specified in this document may be useful for other use cases.
-These may have security, privacy, or operational considerations that are
-outside of the scope of this document.<a href="#section-1-7" class="pilcrow">¶</a></p>
-<p id="section-1-8">However we will focus primarily<a href="#section-1-8" class="pilcrow">¶</a></p>
-<p id="section-1-9">This flag is intended to be used by clients sending automated traffic, not
-those that are directly operated by (human) users. Clients that set this flag
-<span class="bcp14">SHOULD</span> only do so when a client certificate is directly available to them, and
-<span class="bcp14">MUST NOT</span> prompt the user or take actions that would prompt the user for example
-trying to read certificates from off-board devices such as smart cards.<a href="#section-1-9" class="pilcrow">¶</a></p>
+However, it may have security, privacy, or operational considerations that are
+relevant to these use cases but are not directly addressed here.<a href="#section-1-7" class="pilcrow">¶</a></p>
+<p id="section-1-8">In particular, the <code>request_client_auth</code> flag is not intended to be used by web
+browsers or other clients operated directly by human users. Clients that set
+this flag should only do so when a client certificate is directly available to
+them, and must not prompt the user or take actions that would prompt the user
+for example trying to read certificates from off-board devices such as smart
+cards.<a href="#section-1-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">

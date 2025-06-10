@@ -117,15 +117,14 @@ Table of Contents
    add a reference here.]]
 
    The mechanism specified in this document may be useful for other use
-   cases.  These may have security, privacy, or operational
-   considerations that are outside of the scope of this document.
+   cases.  However, it may have security, privacy, or operational
+   considerations that are relevant to these use cases but are not
+   directly addressed here.
 
-   However we will focus primarily
-
-   This flag is intended to be used by clients sending automated
-   traffic, not those that are directly operated by (human) users.
-   Clients that set this flag SHOULD only do so when a client
-   certificate is directly available to them, and MUST NOT prompt the
+   In particular, the request_client_auth flag is not intended to be
+   used by web browsers or other clients operated directly by human
+   users.  Clients that set this flag should only do so when a client
+   certificate is directly available to them, and must not prompt the
    user or take actions that would prompt the user for example trying to
    read certificates from off-board devices such as smart cards.
 
