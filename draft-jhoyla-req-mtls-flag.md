@@ -135,15 +135,30 @@ terminate the connection with a fatal `illegal_parameter` alert.
 
 # Security Considerations
 
-This flag should have no effect on the security of TLS, as the server may
-always send a `CertificateRequest` message during the handshake. This flag
-merely provides a hint that the client will handle the request gracefully.
-Because the server acknowledges the flag in the `CertificateRequest` the client
-can always be sure whether a `CertificateRequest` was triggered by
-`request_client_auth` or not.
+On its own, this flag should have no effect on the security of TLS, as the
+server may always send a `CertificateRequest` message during the handshake.
+This flag merely provides a hint that the client will handle the request
+gracefully. Because the server acknowledges the flag in the
+`CertificateRequest` the client can always be sure whether a
+`CertificateRequest` was triggered by `request_client_auth` or not.
 
-TODO: Discuss security considerations related to a flag that changes which
-trust anchors are offered and how to handle/authorise application data.
+However, implementing the use case for which the flag is used may entail
+significant changes to how the client selects a certificate and hoow the
+certificate validates it. It also affects how the server handles application
+data transmitted over the established connection.
+
+For example, in the use case described in {{introduction}}, a client such as a
+web crawler wishes to identify itself to a web server as a trusted source of
+automated traffic. Suppose the server wants to support this mechanism, but it
+already always requests a certificate in order to grant certain clients access
+to some HTTP resource. The server must take care to ensure this access is not
+also granted to the web crawler.
+
+When the server accepts the `request_client_auth` flag, it SHOULD verify the
+certificate against a set of trust anchors that is disjoint from the set of
+trust anchors it uses when the flag is ignored or rejected. Failure to do so
+may result in authenticating a bot when they are not intended to be
+authenticated.
 
 # IANA Considerations
 
