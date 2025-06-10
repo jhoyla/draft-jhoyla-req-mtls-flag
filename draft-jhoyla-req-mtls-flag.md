@@ -65,8 +65,8 @@ mixed in with general traffic.
 
 This flag is intended to be used by clients sending automated traffic, not
 those that are directly operated by (human) users. Clients that set this flag
-SHOULD only do so when a client certificate is directly available to them, and
-MUST NOT prompt the user or take actions that would prompt the user for example
+should only do so when a client certificate is directly available to them, and
+must not prompt the user or take actions that would prompt the user for example
 trying to read certificates from off-board devices such as smart cards.
 
 # Conventions and Definitions
