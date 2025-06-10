@@ -100,16 +100,16 @@ Table of Contents
    ever increasing fraction of the overall traffic to a given web
    server.  It is useful for the server to be able to distinguish these
    sources from one another and, especially, from human users, as this
-   allows the server to better accommodate the different requirements of
-   each group of clients.  For example, web browsers are much more
-   latency sensitive than web crawlers.  On the other hand, it may be
-   prudent to treat requests from web browsers with more scrutiny than
-   requests from a well-known web-crawler whose behaviour is relatively
+   allows it to better accommodate the different requirements of each
+   group of clients.  For example, web browsers are much more latency
+   sensitive than web crawlers.  On the other hand, it may be prudent to
+   treat requests from web browsers with more scrutiny than requests
+   from a well-known web-crawler whose behaviour is relatively
    predictable.
 
    This dynamic creates an incentive for attackers to impersonate
-   trusted sources of automated traffic to the server: to benefit from
-   whatever accommodations are conferred on trusted sources.
+   trusted sources of automated traffic to the server: to confer onto
+   itself whatever accommodations are conferred on trusted sources.
    Authentication of the TLS client is sufficient to thwart such
    attacks, and while there are other approaches to solving this problem
    (see Appendix A.1), authentication at the TLS layer has several
@@ -117,7 +117,7 @@ Table of Contents
    add a reference here.]]
 
    The mechanism specified in this document may be useful for other use
-   cases.  However, it may have security, privacy, or operational
+   cases.  However, it may entail security, privacy, or operational
    considerations that are relevant to these use cases but are not
    directly addressed here.
 
@@ -256,7 +256,7 @@ A.1.  Alternative Approaches
 A.1.1.  HTTP Signatures
 
    HTTP Signatures [I-D.draft-meunier-web-bot-auth-architecture]
-   describes a mechanism for implementingd bearer tokens at the HTTP
+   describes a mechanism for implementing bearer tokens at the HTTP
    layer that authenticate requests.  This mechanism suffers from a
    number of drawbacks, notably that a new signature must be created and
    verified for every request (rather than one per connection), and
