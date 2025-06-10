@@ -39,7 +39,7 @@ this hint.
 
 --- middle
 
-# Introduction
+# Introduction {#introduction}
 
 This document specifies a TLS Flag {{!I-D.ietf-tls-tlsflags}} that allows a
 client to prompt the server to request a client certificate during the
@@ -144,15 +144,32 @@ terminate the connection with a fatal `illegal_parameter` alert.
 
 # Security Considerations
 
-This flag should have no effect on the security of TLS, as the server may
-always send a `CertificateRequest` message during the handshake. This flag
-merely provides a hint that the client will handle the request gracefully.
-Because the server acknowledges the flag in the `CertificateRequest` the client
-can always be sure whether a `CertificateRequest` was triggered by
-`request_client_auth` or not.
+On its own, this flag should have no effect on the security of TLS, as the
+server may always send a `CertificateRequest` message during the handshake.
+This flag merely provides a hint that the client will handle the request
+gracefully. Because the server acknowledges the flag in the
+`CertificateRequest` the client can always be sure whether a
+`CertificateRequest` was triggered by `request_client_auth` or not.
 
-TODO: Discuss security considerations related to a flag that changes which
-trust anchors are offered and how to handle/authorise application data.
+However, the use case for which the flag is enabled may entail significant
+changes to how the client selects a certificate and what trust anchors the
+server uses to validate it. The use case may also impact how the server handles
+application data transmitted over the established connection.
+
+In the case of identifying web crawlers ({{introduction}}), a web server would
+largely handle traffic from a web crawler as if it were any unauthenticated
+client. If for instance the server already requests a certificate to grant
+certain clients access to some resource, the server must take care to ensure
+this access is not also granted to the web crawler.
+
+A server that uses one set of trust anchors to verify clients that send
+`req_client_auth` and another set of trust anchors to verify other traffic must
+take care to ensure that the appropriate trust anchors are selected in each
+case, otherwise it might be possible for a client to incorrectly gain access to
+resources it should not be able to reach. If this is a risk in a given
+deployment a potential mitigation is to ensure that the set of certificates
+that chain to the bots trust anchors and those that chain to other sets of
+trust anchors are disjoint.
 
 # IANA Considerations
 
