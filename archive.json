@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-08T00:34:00.618534+00:00",
+  "timestamp": "2025-06-10T00:30:37.092850+00:00",
   "repo": "jhoyla/draft-jhoyla-req-mtls-flag",
   "labels": [
     {
@@ -62,9 +62,66 @@
       "labels": [],
       "body": "\"This enables a number of use cases, for example allowing bots to authenticate themselves when mixed in with general traffic.\"\n\nAfter some discussion with you and others seems to indicate that there may be an opinion that \"browsers shouldn't do this\"\n\nIf the intention is truly for \"bot-auth\" should this really be about only bot-auth - and perhaps include being opinionated about what the bot-auth is to perhaps simplify the resulting pki for this? (maybe not just any old X.509 certificate blob with path building etc,  but perhaps something more limited or even a raw public key to encourage dedicated trust stores for this purpose?)\n\nOr is the intention here to be a generic \"it's safe to send me a certificate request\" that browsers/clients/things-not-bots could possibly start using for certain things - and leaving \"bot-auth\" to have to disambiguate the cases (i.e. what trust store to use) on the server by other means if both are in use. \n",
       "createdAt": "2025-03-18T07:49:25Z",
-      "updatedAt": "2025-03-18T07:49:25Z",
+      "updatedAt": "2025-06-09T18:50:57Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "body": "So after discussions with various people, there seems to be a strong push for this to be \"bot-auth\" only. That's probably ok, as long as we're not too specific about what \"bot\" means. \n\nI don't like the idea of raw public keys, because it requires us to reinvent a number of wheels, e.g. expiry, rotation, delegation, binding names to keys, provisioning, etc. Restricting the certs to SPIFFE certs holds a certain appeal to me, but I'm not sure what others think. @cjpatton?",
+          "createdAt": "2025-06-09T17:10:20Z",
+          "updatedAt": "2025-06-09T17:10:20Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I don't have an especially strong opinion here. We certainly should try to keep the PKI simple, but I don't see a reason to go as far as using raw public keys rather than X.509. Rather we might try to be prescriptive about how the server selects trust anchors when the flag is negotiated.",
+          "createdAt": "2025-06-09T17:46:33Z",
+          "updatedAt": "2025-06-09T17:46:33Z"
+        },
+        {
+          "author": "bob-beck",
+          "authorAssociation": "NONE",
+          "body": "I await the chatgpt generated bike sheds for the definition of a bot, but to me at least at the moment for this draft I think it means \"There is no meatspace entity sitting at a keyboard causing this connection to be made with interactive expectations\".  \n\"I am not a web browser\". ",
+          "createdAt": "2025-06-09T17:52:44Z",
+          "updatedAt": "2025-06-09T17:52:44Z"
+        },
+        {
+          "author": "bob-beck",
+          "authorAssociation": "NONE",
+          "body": "I agree with keeping it simple, and I don't think bringing in extra opinions in this draft about what form the certificate will take will help that unless we can't solve an issue any other way.   \n\n",
+          "createdAt": "2025-06-09T17:54:49Z",
+          "updatedAt": "2025-06-09T17:54:49Z"
+        },
+        {
+          "author": "bob-beck",
+          "authorAssociation": "NONE",
+          "body": "Assuming a server is responding with an echo'ed flag in a certificate request message, the server can either choose to include the CA extension (or possibly in the future TLS Trust Anchor IDs) to tell the client what it wants, or not include it and the client today gets to \"guess\" based on \"ecosystem expectation\" like any other time one end of a TLS connection gets to send a cert without being given a hint. \n\nIf the client doesn't want to \"guess\" it's of course free to send the empty certificate and the server decides if it wants to continue. \n\nIs there a problem with that model here? if not we don't need to say anything. ",
+          "createdAt": "2025-06-09T18:05:44Z",
+          "updatedAt": "2025-06-09T18:07:54Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "The only problem I can see is if the server conflates the bot PKI with the existing PKI it currently uses for the client authentication, e.g., by allowing a cross-sign of a bot cert by the exiting PKI or vise versa. But I don't know that there's a protocol change that could avoid that.",
+          "createdAt": "2025-06-09T18:20:59Z",
+          "updatedAt": "2025-06-09T18:22:25Z"
+        },
+        {
+          "author": "bob-beck",
+          "authorAssociation": "NONE",
+          "body": "But of course it might do that intentionally.  \n\nSo, is this scenario a valid use case or not: \n\nI am Bob. I use a client cert signed by a root from honestachmed.ca to authenticate myself for access to POST things to several API's on the site. so /api/foo, /api/bar, and /api/global-thermonuclear-war.\n\nI also write/use agentic bots to do things on my behalf. they do things as me, with my cert. \n\nThe server differentiates on the client sending the \"I am a bot\" extension to only grant bob as a bot access to api/foo and api/bar, and not api/global-thermonuclear-war. \n\nNow, I'm not strictly saying this is a good idea or a bad idea. but it's something someone might do. ",
+          "createdAt": "2025-06-09T18:41:39Z",
+          "updatedAt": "2025-06-09T18:41:39Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think this example shows that \"human-in-the-loop\" is not the right way to think of \"bot\". What matters to us I think is what access is granted to the client, not whether the client is human or a bot acting on behalf of a human. See https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/6#issuecomment-2956638120.",
+          "createdAt": "2025-06-09T18:50:56Z",
+          "updatedAt": "2025-06-09T18:50:56Z"
+        }
+      ]
     },
     {
       "number": 6,
@@ -78,7 +135,7 @@
       "labels": [],
       "body": "This is interesting because even if the flag on its own has no security impact, the use case we intend to support here -- web bot auth -- certainly does. Namely, we have to override the logic the server uses to decide whether to send a CertificateRequest, how to select a trust anchor to validate the Certificate, and how to handle application data. We don't want to authorize HTTP requests from a crawler that would otherwise require a different client identity.\r\n\r\nGiven the WG feedback so far, I think we'll need to discuss this here. If you'd rather do it in a separate PR, then feel free to just leave a TODO here.\r\n\r\n_Originally posted by @cjpatton in https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/4#discussion_r2114816776_\r\n            ",
       "createdAt": "2025-05-30T14:15:26Z",
-      "updatedAt": "2025-05-30T16:21:08Z",
+      "updatedAt": "2025-06-09T18:44:40Z",
       "closedAt": null,
       "comments": [
         {
@@ -87,6 +144,34 @@
           "body": "Note: The scope of this issue might change if (1) we decide to scope the draft to \"request bot auth\" (#3) and (2) we decide the draft itself should manage the complexity of authentication logic, e.g., by partitioning the set of trust anchors and spelling out requirements for CAs.",
           "createdAt": "2025-05-30T16:02:44Z",
           "updatedAt": "2025-05-30T16:02:44Z"
+        },
+        {
+          "author": "bob-beck",
+          "authorAssociation": "NONE",
+          "body": "I'm not sure it needs to manage partitioning a trust anchor set as is.  Assuming the client sends the extension and it \"means whatever we decide it means\" and the server replies with a certificate request message echoing the extension, The server is certainly free to tell the client what CA it expects for this via the CA extension, which would be the normal way servers do this today.  Chris do you see a need to change that? \n\nNow, of course, this could then end up with something the client can't satisfy, at which point we are back to sending an empty certificate reply, and the server gets to decide if it wants to proceed or not. \n",
+          "createdAt": "2025-06-09T17:48:28Z",
+          "updatedAt": "2025-06-09T17:48:28Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> I'm not sure it needs to manage partitioning a trust anchor set as is. Assuming the client sends the extension and it \"means whatever we decide it means\" and the server replies with a certificate request message echoing the extension, The server is certainly free to tell the client what CA it expects for this via the CA extension, which would be the normal way servers do this today. Chris do you see a need to change that?\n\nI don't think we need to change this logic, no. My concern has more to do with how the certificate is used to handle application data.\n\nSuppose for instance that the server is configured to always request a certificate so that, if the client presents a valid certificate, it gets access to certain HTTP resources (like `POST /admin/api` or something). If the server grants access if _any_ certificate is presented, then it might inadvertently grant access to a bot as well.  The server needs to modify its logic to grant access only if the right certificate is used.\n\nI don't think we necessarily need to deal with this at the protocol level, but it's worthy of a security consideration that helps implementers do the right thing.\n\n> Now, of course, this could then end up with something the client can't satisfy, at which point we are back to sending an empty certificate reply, and the server gets to decide if it wants to proceed or not.\n\nThat sounds right to me. Have you had a chance to look at the text since @jhoyla's last PR (#4)? I think that's more or less what the draft says now. Do you think this is the right client behavior?",
+          "createdAt": "2025-06-09T18:14:24Z",
+          "updatedAt": "2025-06-09T18:14:24Z"
+        },
+        {
+          "author": "bob-beck",
+          "authorAssociation": "NONE",
+          "body": "\"If the server grants access if any certificate is presented, then it might inadvertently grant access to a bot as well. The server needs to modify its logic to grant access only if the right certificate is used.\"\n\nI think this comes down to defining what \"bot auth\" means, and with that, writing an appropriate security considerations section indicating that implementors need to ensure that access is only granted to things appropriate for bot auth. This can also of course, include restricting things that would otherwise be accessible without a certificate if I was not a bot ;) \n\n",
+          "createdAt": "2025-06-09T18:26:44Z",
+          "updatedAt": "2025-06-09T18:27:18Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Agreed. To me the definition of bot auth is most relevant to (or even _only relevant to_?) how we treat application data. Namely, we treat the TLS client as if it were an unauthenticated TLS client, except the server might bypass some security measure applied to unauthenticated TLS clients. For instance, we want to rate limit clients _pretending_ to be GoogleBot, but not GoogleBot itself.\n\n@jhoyla has been thinking about this for a lot longer than me and perhaps has a more precise definition in mind!",
+          "createdAt": "2025-06-09T18:44:39Z",
+          "updatedAt": "2025-06-09T18:44:39Z"
         }
       ]
     },
@@ -225,24 +310,26 @@
       "id": "PR_kwDOKjmGVs6TcGtu",
       "title": "Client MUST send empty Certificate message",
       "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/4",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "jhoyla",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Clients that receive `CertificateRequest`s in practice will terminate the connection in anticipation of a \"certificate_required\" alert, rather than sending an empty `Certificate` message, as specified in [RFC-8446, Section 4.4.2](https://www.rfc-editor.org/rfc/rfc8446#section-4.4.2).\r\nThis PR updates the draft to specify that the client MUST send an empty `Certificate` message, and SHOULD NOT terminate the connection in anticipation of a \"certificate_required\" alert.\r\nWe can't require a MUST NOT terminate the connection, as the client might want to terminate the connection for other, unrelated reasons.",
       "createdAt": "2025-04-22T13:20:28Z",
-      "updatedAt": "2025-05-30T14:26:17Z",
+      "updatedAt": "2025-06-09T12:55:18Z",
       "baseRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
       "baseRefName": "main",
       "baseRefOid": "9885460cf74ddbd2ac1bfc70e21ddbc10ae797a7",
       "headRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
       "headRefName": "jhoyla/empty-cert-message",
       "headRefOid": "3e5b34c7d8e072683cc328a359358b6eb043ddd0",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-06-09T12:55:18Z",
+      "mergedAt": "2025-06-09T12:55:18Z",
+      "mergedBy": "jhoyla",
+      "mergeCommit": {
+        "oid": "b197cbd30ee01853b1d1a176a0b56a1ab5b5575b"
+      },
       "comments": [
         {
           "author": "jhoyla",
@@ -605,6 +692,95 @@
       },
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 11,
+      "id": "PR_kwDOKjmGVs6ZsKKn",
+      "title": "Add appendix",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/11",
+      "state": "OPEN",
+      "author": "jhoyla",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Add appendix discussing alternative solutions.\r\n\r\nCloses #10.\r\nCloses #8.\r\nCloses #7.",
+      "createdAt": "2025-06-09T13:55:58Z",
+      "updatedAt": "2025-06-09T16:45:07Z",
+      "baseRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "baseRefName": "main",
+      "baseRefOid": "b197cbd30ee01853b1d1a176a0b56a1ab5b5575b",
+      "headRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "headRefName": "jhoyla/feedback",
+      "headRefOid": "111f03827bb57d973be30303550b1cb2f6d359fe",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOKjmGVs6tfDjU",
+          "commit": {
+            "abbreviatedOid": "111f038"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Nice! I updated the top comment to reference the issues this PR closes.\r\n",
+          "createdAt": "2025-06-09T16:29:28Z",
+          "updatedAt": "2025-06-09T16:45:07Z",
+          "comments": [
+            {
+              "originalPosition": 10,
+              "body": "Not a draft anymore ;)\r\n```suggestion\r\nConcealed Auth {{?RFC9729}} allows a client to attach a header\r\n```",
+              "createdAt": "2025-06-09T16:29:28Z",
+              "updatedAt": "2025-06-09T16:47:10Z"
+            },
+            {
+              "originalPosition": 14,
+              "body": "```suggestion\r\nin some contexts, but in the case of authenticating bots may be difficult to\r\n```",
+              "createdAt": "2025-06-09T16:30:04Z",
+              "updatedAt": "2025-06-09T16:45:07Z"
+            },
+            {
+              "originalPosition": 14,
+              "body": "Also, why would this be hard to implement specifically for the bots use case and not others?",
+              "createdAt": "2025-06-09T16:32:38Z",
+              "updatedAt": "2025-06-09T16:45:07Z"
+            },
+            {
+              "originalPosition": 27,
+              "body": "We should mention the possibility of modifying the pooling code.\r\n```suggestion\r\n\r\nIt is possible to avoid this issue, for example by not using connection pooling, or modifying\r\nthe implementation so that the first request on each new connection includes the binding.\r\nIf modifying the implementation is not possible, then there are some ad-hoc options, such as\r\nsending a special \"pre-request\" on each connection that's added to a pool,\r\nhowever these solutions tend to be bespoke per library and bring a number of\r\ntheir own issues (e.g. handling servers that terminate connections after a\r\nsingle request, or handling resumption).\r\n```",
+              "createdAt": "2025-06-09T16:38:35Z",
+              "updatedAt": "2025-06-09T16:45:07Z"
+            },
+            {
+              "originalPosition": 35,
+              "body": "Add a reference for these reservations.",
+              "createdAt": "2025-06-09T16:39:38Z",
+              "updatedAt": "2025-06-09T16:45:07Z"
+            },
+            {
+              "originalPosition": 41,
+              "body": "Say why this is functionally equivalent. We might need to flesh out the proposal a bit more.",
+              "createdAt": "2025-06-09T16:40:48Z",
+              "updatedAt": "2025-06-09T16:45:07Z"
+            },
+            {
+              "originalPosition": 50,
+              "body": "Mention the CDN use case specifically.",
+              "createdAt": "2025-06-09T16:41:11Z",
+              "updatedAt": "2025-06-09T16:45:07Z"
+            },
+            {
+              "originalPosition": 43,
+              "body": "I would put this section first since this draft shares the same exact motivation as ours. I would also mention the shared motivation explicitly.",
+              "createdAt": "2025-06-09T16:41:48Z",
+              "updatedAt": "2025-06-09T16:45:07Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
