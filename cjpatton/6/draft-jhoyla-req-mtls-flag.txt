@@ -188,10 +188,10 @@ Table of Contents
    a CertificateRequest was triggered by request_client_auth or not.
 
    However, the use case for which the flag is enabled may entail
-   significant changes to how the client selects a certificate and how
-   the certificate validates it.  The use case may also impact how the
-   server handles application data transmitted over the established
-   connection.
+   significant changes to how the client selects a certificate and what
+   trust anchor the server uses to validate it.  The use case may also
+   impact how the server handles application data transmitted over the
+   established connection.
 
    In the case of identifying web crawlers (see Section 1), a web server
    would largely handle traffic from a web crawler as if it were any
