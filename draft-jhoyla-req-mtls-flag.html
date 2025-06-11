@@ -1210,7 +1210,7 @@ might wish to authenticate a subset of them. In TLS 1.3 this may be done with
 post-handshake authentication, however this adds an extra round trip, and
 requires negotiation at the application layer.<a href="#section-1-1" class="pilcrow">¶</a></p>
 <p id="section-1-2">The behaviour specified in <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span> for a client that receives a
-<code>CertificateRequest</code> that it cannot satisfy is to send an empty Certificate
+<code>CertificateRequest</code> that it cannot satisfy is to send an empty <code>Certificate</code>
 message followed by a <code>Finished</code> message. However in practice many clients
 simply terminate the connection in anticipation of a "certificate_required"
 alert.<a href="#section-1-2" class="pilcrow">¶</a></p>
@@ -1219,13 +1219,13 @@ messages in the wild. A client sending the <code>request_client_auth</code> flag
 <code>ClientHello</code> allows the server to request authentication during the initial
 handshake only when it receives a hint the client will handle the request
 without terminating the connection, and, if unable to authenticate, by sending
-an empty certificate message, per <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>], <a href="https://rfc-editor.org/rfc/rfc8446#section-4.4.2" class="relref">Section 4.4.2</a></span>. This enables a
+an empty <code>Certificate</code> message, per <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>], <a href="https://rfc-editor.org/rfc/rfc8446#section-4.4.2" class="relref">Section 4.4.2</a></span>. This enables a
 number of use cases, for example allowing bots to authenticate themselves when
 mixed in with general traffic.<a href="#section-1-3" class="pilcrow">¶</a></p>
 <p id="section-1-4">This flag is intended to be used by clients sending automated traffic, not
 those that are directly operated by (human) users. Clients that set this flag
-<span class="bcp14">SHOULD</span> only do so when a client certificate is directly available to them, and
-<span class="bcp14">MUST NOT</span> prompt the user or take actions that would prompt the user for example
+should only do so when a client certificate is directly available to them, and
+must not prompt the user or take actions that would prompt the user for example
 trying to read certificates from off-board devices such as smart cards.<a href="#section-1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1249,31 +1249,33 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 message, and, if accepted by the server, acknowledged in the server's
 <code>CertificateRequest</code> message. A server that receives this flag and wishes to
 accept the extension <span class="bcp14">MUST</span> send a <code>CertificateRequest</code> message with the TLS
-Flags extension, and with the <code>request_client_auth</code> flag set. The server <span class="bcp14">MAY</span>
-send a <code>CertificateRequest</code> message without the <code>request_client_auth</code> flag set
-if it wishes to negotiate client authentication for another reason. This could
-occur if the server is configured to always request a client certificate. The
-client sending this flag <span class="bcp14">MUST</span> send a <code>Certificate</code> message if it receives a
+Flags extension, and with the <code>request_client_auth</code> flag set. This informs the
+client that the reason for the <code>CertificateRequest</code> was because of the
+<code>request_client_auth</code> flag and not due to some other policy. This allows
+clients to select certificates based on whether the server accepted the flag or
+not.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">The server <span class="bcp14">MAY</span> send a <code>CertificateRequest</code> message without the
+<code>request_client_auth</code> flag set if it wishes to negotiate client authentication
+for another reason. This could occur if, for example, the server is configured
+to always request a client certificate.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">The client sending this flag <span class="bcp14">MUST</span> send a <code>Certificate</code> message if it receives a
 <code>CertificateRequest</code> with the <code>request_client_auth</code> flag set, even if said
 <code>Certificate</code> message is empty, and <span class="bcp14">SHOULD NOT</span> preemptively terminate the
 connection anticipating a "certificate_required" alert. Appropriate cases where
 a client would preemptively terminate the connection include where the
 <code>CertificateRequest</code> includes a <code>certificate_authorities</code> extension or
-<code>signature_algorithms</code> extension that the client cannot satisfy.<a href="#section-3-1" class="pilcrow">¶</a></p>
-<p id="section-3-2">A server receiving the <code>request_client_auth</code> flag in a <code>ClientHello</code> message
-that wishes to accept the flag <span class="bcp14">MUST</span> echo the <code>request_client_auth</code> flag in the
-<code>CertificateRequest</code> message. This informs the client that the reason for the
-<code>CertificateRequest</code> was because of the <code>request_client_auth</code> flag and not due
-to some other policy. This allows clients to select certificates based on
-whether the server accepted the flag or not.<a href="#section-3-2" class="pilcrow">¶</a></p>
-<p id="section-3-3">A server <span class="bcp14">MUST NOT</span> set the <code>request_client_auth</code> flag in the
+<code>signature_algorithms</code> extension that the client cannot satisfy.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-4">Clients that set this flag <span class="bcp14">SHOULD</span> only do so when a client certificate is
+directly available to them, and <span class="bcp14">MUST NOT</span> prompt the user or take actions that
+would prompt the user to provide a certificate.<a href="#section-3-4" class="pilcrow">¶</a></p>
+<p id="section-3-5">A server <span class="bcp14">MUST NOT</span> set the <code>request_client_auth</code> flag in the
 <code>CertificateRequest</code> unless it received the flag in the <code>ClientHello</code>. A client
 receiving the <code>request_client_auth</code> flag that did not set it in the
-<code>ClientHello</code> <span class="bcp14">MUST</span> generate a fatal <code>illegal_parameter</code> alert.<a href="#section-3-3" class="pilcrow">¶</a></p>
-<p id="section-3-4">A client that receives this flag in any message other than <code>CertificateRequest</code>
+<code>ClientHello</code> <span class="bcp14">MUST</span> generate a fatal <code>illegal_parameter</code> alert.<a href="#section-3-5" class="pilcrow">¶</a></p>
+<p id="section-3-6">A client that receives this flag in any message other than <code>CertificateRequest</code>
         <span class="bcp14">MUST</span> terminate the connection with a fatal <code>illegal_parameter</code> alert. Similarly
 a server that receives this flag in any message other than <code>ClientHello</code> <span class="bcp14">MUST</span>
-terminate the connection with a fatal <code>illegal_parameter</code> alert.<a href="#section-3-4" class="pilcrow">¶</a></p>
+terminate the connection with a fatal <code>illegal_parameter</code> alert.<a href="#section-3-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
