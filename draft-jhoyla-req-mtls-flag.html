@@ -1049,7 +1049,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">RFC 0</td>
 <td class="center">TLS Flag - Request Client Auth</td>
-<td class="right">May 2025</td>
+<td class="right">June 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Hoyland</td>
@@ -1068,7 +1068,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="category">Informational</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-05" class="published">May 2025</time>
+<time datetime="2025-06" class="published">June 2025</time>
     </dd>
 <dt class="label-issn">ISSN:</dt>
 <dd class="issn">2070-1721</dd>
@@ -1164,10 +1164,35 @@ this hint.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-appendix" class="internal xref">Appendix</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                <p id="section-toc.1-1.7.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-alternative-approaches" class="internal xref">Alternative Approaches</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1.2.1">
+                    <p id="section-toc.1-1.7.2.1.2.1.1"><a href="#appendix-A.1.1" class="auto internal xref">A.1.1</a>.  <a href="#name-http-signatures" class="internal xref">HTTP Signatures</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1.2.2">
+                    <p id="section-toc.1-1.7.2.1.2.2.1"><a href="#appendix-A.1.2" class="auto internal xref">A.1.2</a>.  <a href="#name-concealed-auth" class="internal xref">Concealed Auth</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1.2.3">
+                    <p id="section-toc.1-1.7.2.1.2.3.1"><a href="#appendix-A.1.3" class="auto internal xref">A.1.3</a>.  <a href="#name-post-handshake-authenticati" class="internal xref">Post-handshake Authentication (PHA)</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1.2.4">
+                    <p id="section-toc.1-1.7.2.1.2.4.1"><a href="#appendix-A.1.4" class="auto internal xref">A.1.4</a>.  <a href="#name-alpn" class="internal xref">ALPN</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1.2.5">
+                    <p id="section-toc.1-1.7.2.1.2.5.1"><a href="#appendix-A.1.5" class="auto internal xref">A.1.5</a>.  <a href="#name-client-initiated-exported-a" class="internal xref">Client-Initiated Exported Authenticators</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -1324,25 +1349,141 @@ TLS namespace with the following values:<a href="#section-5-1" class="pilcrow">�
 <a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
+<dt id="CHHSV17">[CHHSV17]</dt>
+        <dd>
+<span class="refAuthor">Cremers, C.</span>, <span class="refAuthor">Horvat, M.</span>, <span class="refAuthor">Hoyland, J.</span>, <span class="refAuthor">Scott, S.</span>, and <span class="refAuthor">T. van der Merwe</span>, <span class="refTitle">"A Comprehensive Symbolic Analysis of TLS 1.3"</span>, <span class="refContent">ACM</span>, <span class="seriesInfo">Proceedings of the 2017 ACM SIGSAC Conference on Computer and Communications Security pp. 1773-1788</span>, <span class="seriesInfo">DOI 10.1145/3133956.3134063</span>, <time datetime="2017-10" class="refDate">October 2017</time>, <span>&lt;<a href="https://doi.org/10.1145/3133956.3134063">https://doi.org/10.1145/3133956.3134063</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.draft-meunier-web-bot-auth-architecture">[I-D.draft-meunier-web-bot-auth-architecture]</dt>
+        <dd>
+<span class="refAuthor">Meunier, T.</span>, <span class="refTitle">"HTTP Message Signatures for automated traffic Architecture"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-meunier-web-bot-auth-architecture-01</span>, <time datetime="2025-05-07" class="refDate">7 May 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-meunier-web-bot-auth-architecture-01">https://datatracker.ietf.org/doc/html/draft-meunier-web-bot-auth-architecture-01</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC8446">[RFC8446]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8446">https://www.rfc-editor.org/rfc/rfc8446</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9261">[RFC9261]</dt>
+        <dd>
+<span class="refAuthor">Sullivan, N.</span>, <span class="refTitle">"Exported Authenticators in TLS"</span>, <span class="seriesInfo">RFC 9261</span>, <span class="seriesInfo">DOI 10.17487/RFC9261</span>, <time datetime="2022-07" class="refDate">July 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9261">https://www.rfc-editor.org/rfc/rfc9261</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9729">[RFC9729]</dt>
+      <dd>
+<span class="refAuthor">Schinazi, D.</span>, <span class="refAuthor">Oliver, D.</span>, and <span class="refAuthor">J. Hoyland</span>, <span class="refTitle">"The Concealed HTTP Authentication Scheme"</span>, <span class="seriesInfo">RFC 9729</span>, <span class="seriesInfo">DOI 10.17487/RFC9729</span>, <time datetime="2025-02" class="refDate">February 2025</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9729">https://www.rfc-editor.org/rfc/rfc9729</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
 </div>
 </section>
 </div>
-<div id="acknowledgments">
+<div id="appendix">
 <section id="appendix-A">
+      <h2 id="name-appendix">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-appendix" class="section-name selfRef">Appendix</a>
+      </h2>
+<div id="alternative-approaches">
+<section id="appendix-A.1">
+        <h3 id="name-alternative-approaches">
+<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-alternative-approaches" class="section-name selfRef">Alternative Approaches</a>
+        </h3>
+<div id="http-signatures">
+<section id="appendix-A.1.1">
+          <h4 id="name-http-signatures">
+<a href="#appendix-A.1.1" class="section-number selfRef">A.1.1. </a><a href="#name-http-signatures" class="section-name selfRef">HTTP Signatures</a>
+          </h4>
+<p id="appendix-A.1.1-1">HTTP Signatures <span>[<a href="#I-D.draft-meunier-web-bot-auth-architecture" class="cite xref">I-D.draft-meunier-web-bot-auth-architecture</a>]</span> describes a
+mechanism for implementing bearer tokens at the HTTP layer that authenticate
+requests. This mechanism suffers from a number of drawbacks, notably that a new
+signature must be created and verified for every request (rather than one per
+connection), and second that, because the tokens are not bound to the
+underlying TLS connection they can be stolen and replayed. This is especially
+problematic in the multi-CDN ("Content Distribution Network") use case. If a
+bot creates a token for a realm that is provided by more than one CDN then the
+CDN that receives that token can use it to attack any of the other CDNs. This
+means that all CDNs are required to trust each other.<a href="#appendix-A.1.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="concealed-auth">
+<section id="appendix-A.1.2">
+          <h4 id="name-concealed-auth">
+<a href="#appendix-A.1.2" class="section-number selfRef">A.1.2. </a><a href="#name-concealed-auth" class="section-name selfRef">Concealed Auth</a>
+          </h4>
+<p id="appendix-A.1.2-1">Concealed Auth <span>[<a href="#RFC9729" class="cite xref">RFC9729</a>]</span> allows a client to attach a header at the HTTP
+layer that cryptographically binds a public key to the underlying TLS
+connection. This gives us a similar authentication property to using
+<code>request_client_auth</code>, and is also client initiated. This solution is
+applicable in some contexts, but may be difficult to implement.<a href="#appendix-A.1.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.1.2-2">The way many HTTP libraries work is that they dispatch requests to a connection
+pool. Once the request arrives at the pool it is sent on a chosen connection
+driven by internal logic. This, unfortunately, makes it difficult to know which
+connection a request will be sent on, and thus to produce the appropriate
+signature.<a href="#appendix-A.1.2-2" class="pilcrow">¶</a></p>
+<p id="appendix-A.1.2-3">It is possible to avoid this issue, for example by not using connection
+pooling, or by modifying the implementation to add the header on the first
+request of each connection. Where modifying the implementation is not possible
+various ad-hoc solutions can be used such as sending a special "pre-request" on
+each connection that's added to a pool. However these solutions tend to be
+bespoke per library and bring a number of their own issues (e.g. handling
+servers that terminate connections after a single request, or handling
+resumption).<a href="#appendix-A.1.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="post-handshake-authentication-pha">
+<section id="appendix-A.1.3">
+          <h4 id="name-post-handshake-authenticati">
+<a href="#appendix-A.1.3" class="section-number selfRef">A.1.3. </a><a href="#name-post-handshake-authenticati" class="section-name selfRef">Post-handshake Authentication (PHA)</a>
+          </h4>
+<p id="appendix-A.1.3-1">Post-handshake authentication is part of the core TLS 1.3 RFC, although it is
+not widely supported. Its use incurs an extra round-trip, and would need
+negotiation at the application layer. This just trades one negotiation for
+another, whilst making the protocol more expensive to run. Further there are
+some reservations about its security guarantees
+<span>[<a href="#CHHSV17" class="cite xref">CHHSV17</a>]</span>, Section 5.2.<a href="#appendix-A.1.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="alpn">
+<section id="appendix-A.1.4">
+          <h4 id="name-alpn">
+<a href="#appendix-A.1.4" class="section-number selfRef">A.1.4. </a><a href="#name-alpn" class="section-name selfRef">ALPN</a>
+          </h4>
+<p id="appendix-A.1.4-1">One proposal is for the client to send new ALPN extensions, e.g. <code>h2+bot</code>. This
+is functionally equivalent to this draft, but with a less efficient encoding.
+ALPN negotiation consists of a client sending a list of protocols it is willing
+to speak over the TLS connection, and the server selecting exactly one.
+Doubling the number of ALPN entries to include <code>h2+bot, h2</code> and then having the
+server select one by returning <code>h2+bot</code> and a <code>CertificateRequest</code> gives
+exactly the same behaviours to the server receiving a TLS Flag, and echoing it.
+As a side note, it is also an abuse of the ALPN mechanism, as <code>h2</code> and <code>h2+bot</code>
+are indistinguishable at the application layer, the difference is in the TLS
+handshake. This proposal also has the downside of the edge case where the
+server selecting <code>h2+bot</code> but not sending a <code>CertificateRequest</code>.<a href="#appendix-A.1.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="client-initiated-exported-authenticators">
+<section id="appendix-A.1.5">
+          <h4 id="name-client-initiated-exported-a">
+<a href="#appendix-A.1.5" class="section-number selfRef">A.1.5. </a><a href="#name-client-initiated-exported-a" class="section-name selfRef">Client-Initiated Exported Authenticators</a>
+          </h4>
+<p id="appendix-A.1.5-1">Exported Authenticators <span>[<a href="#RFC9261" class="cite xref">RFC9261</a>]</span> allow clients to provide certificates at
+the application layer once the connection is established. A limitation of this
+mechanism is that it has to be triggered by the server, however an update to
+the mechanism to allow the client to send the certificate could also be used to
+solve this mechanism. This would require modifications to both the standard and
+the implementation.<a href="#appendix-A.1.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="appendix-B">
       <h2 id="name-acknowledgments">
 <a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
-<p id="appendix-A-1">TODO acknowledge.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-B-1">TODO acknowledge.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-B">
+<section id="appendix-C">
       <h2 id="name-authors-address">
 <a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
       </h2>
