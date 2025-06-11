@@ -1049,7 +1049,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">RFC 0</td>
 <td class="center">TLS Flag - Request Client Auth</td>
-<td class="right">May 2025</td>
+<td class="right">June 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Hoyland</td>
@@ -1068,7 +1068,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="category">Informational</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-05" class="published">May 2025</time>
+<time datetime="2025-06" class="published">June 2025</time>
     </dd>
 <dt class="label-issn">ISSN:</dt>
 <dd class="issn">2070-1721</dd>
@@ -1176,13 +1176,13 @@ this hint.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
                     <p id="section-toc.1-1.7.2.1.2.2.1"><a href="#appendix-A.1.2" class="auto internal xref">A.1.2</a>.  <a href="#name-concealed-auth" class="internal xref">Concealed Auth</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1.2.3">
-                    <p id="section-toc.1-1.7.2.1.2.3.1"><a href="#appendix-A.1.3" class="auto internal xref">A.1.3</a>.  <a href="#name-post-handshake-authenticati" class="internal xref">Post-handshake authentication (PHA)</a></p>
+                    <p id="section-toc.1-1.7.2.1.2.3.1"><a href="#appendix-A.1.3" class="auto internal xref">A.1.3</a>.  <a href="#name-post-handshake-authenticati" class="internal xref">Post-handshake Authentication (PHA)</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1.2.4">
                     <p id="section-toc.1-1.7.2.1.2.4.1"><a href="#appendix-A.1.4" class="auto internal xref">A.1.4</a>.  <a href="#name-alpn" class="internal xref">ALPN</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1.2.5">
-                    <p id="section-toc.1-1.7.2.1.2.5.1"><a href="#appendix-A.1.5" class="auto internal xref">A.1.5</a>.  <a href="#name-client-initiated-exported-a" class="internal xref">Client-Initiated Exported authenticators</a></p>
+                    <p id="section-toc.1-1.7.2.1.2.5.1"><a href="#appendix-A.1.5" class="auto internal xref">A.1.5</a>.  <a href="#name-client-initiated-exported-a" class="internal xref">Client-Initiated Exported Authenticators</a></p>
 </li>
                 </ul>
 </li>
@@ -1426,12 +1426,12 @@ TLS namespace with the following values:<a href="#section-5-1" class="pilcrow">�
 mechanism for implementing bearer tokens at the HTTP layer that authenticate
 requests. This mechanism suffers from a number of drawbacks, notably that a new
 signature must be created and verified for every request (rather than one per
-connection), and second that, because the tokens are not bound to the underlying
-TLS connection they can be stolen and replayed. This is especially problematic
-in the multi-CDN use case. If a bot creates a token for a realm that is provided
-by more than one CDN then the CDN that receives that token can use it to attack
-any of the other CDNs. This means that all CDNs are required to trust each
-other.<a href="#appendix-A.1.1-1" class="pilcrow">¶</a></p>
+connection), and second that, because the tokens are not bound to the
+underlying TLS connection they can be stolen and replayed. This is especially
+problematic in the multi-CDN ("Content Distribution Network") use case. If a
+bot creates a token for a realm that is provided by more than one CDN then the
+CDN that receives that token can use it to attack any of the other CDNs. This
+means that all CDNs are required to trust each other.<a href="#appendix-A.1.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="concealed-auth">
@@ -1443,8 +1443,7 @@ other.<a href="#appendix-A.1.1-1" class="pilcrow">¶</a></p>
 layer that cryptographically binds a public key to the underlying TLS
 connection. This gives us a similar authentication property to using
 <code>request_client_auth</code>, and is also client initiated. This solution is
-applicable in some contexts, but in the case of authenticating bots may be
-difficult to implement.<a href="#appendix-A.1.2-1" class="pilcrow">¶</a></p>
+applicable in some contexts, but may be difficult to implement.<a href="#appendix-A.1.2-1" class="pilcrow">¶</a></p>
 <p id="appendix-A.1.2-2">The way many HTTP libraries work is that they dispatch requests to a connection
 pool. Once the request arrives at the pool it is sent on a chosen connection
 driven by internal logic. This, unfortunately, makes it difficult to know which
@@ -1454,7 +1453,7 @@ signature.<a href="#appendix-A.1.2-2" class="pilcrow">¶</a></p>
 pooling, or by modifying the implementation to add the header on the first
 request of each connection. Where modifying the implementation is not possible
 various ad-hoc solutions can be used such as sending a special "pre-request" on
-each connection that's added to a pool, however these solutions tend to be
+each connection that's added to a pool. However these solutions tend to be
 bespoke per library and bring a number of their own issues (e.g. handling
 servers that terminate connections after a single request, or handling
 resumption).<a href="#appendix-A.1.2-3" class="pilcrow">¶</a></p>
@@ -1463,7 +1462,7 @@ resumption).<a href="#appendix-A.1.2-3" class="pilcrow">¶</a></p>
 <div id="post-handshake-authentication-pha">
 <section id="appendix-A.1.3">
           <h4 id="name-post-handshake-authenticati">
-<a href="#appendix-A.1.3" class="section-number selfRef">A.1.3. </a><a href="#name-post-handshake-authenticati" class="section-name selfRef">Post-handshake authentication (PHA)</a>
+<a href="#appendix-A.1.3" class="section-number selfRef">A.1.3. </a><a href="#name-post-handshake-authenticati" class="section-name selfRef">Post-handshake Authentication (PHA)</a>
           </h4>
 <p id="appendix-A.1.3-1">Post-handshake authentication is part of the core TLS 1.3 RFC, although it is
 not widely supported. Its use incurs an extra round-trip, and would need
@@ -1494,12 +1493,12 @@ server selecting <code>h2+bot</code> but not sending a <code>CertificateRequest<
 <div id="client-initiated-exported-authenticators">
 <section id="appendix-A.1.5">
           <h4 id="name-client-initiated-exported-a">
-<a href="#appendix-A.1.5" class="section-number selfRef">A.1.5. </a><a href="#name-client-initiated-exported-a" class="section-name selfRef">Client-Initiated Exported authenticators</a>
+<a href="#appendix-A.1.5" class="section-number selfRef">A.1.5. </a><a href="#name-client-initiated-exported-a" class="section-name selfRef">Client-Initiated Exported Authenticators</a>
           </h4>
 <p id="appendix-A.1.5-1">Exported Authenticators <span>[<a href="#RFC9261" class="cite xref">RFC9261</a>]</span> allow clients to provide certificates at
 the application layer once the connection is established. A limitation of this
-mechanism is that it has to be triggered by the server, however an update to the
-mechanism to allow the client to send the certificate could also be used to
+mechanism is that it has to be triggered by the server, however an update to
+the mechanism to allow the client to send the certificate could also be used to
 solve this mechanism. This would require modifications to both the standard and
 the implementation.<a href="#appendix-A.1.5-1" class="pilcrow">¶</a></p>
 </section>

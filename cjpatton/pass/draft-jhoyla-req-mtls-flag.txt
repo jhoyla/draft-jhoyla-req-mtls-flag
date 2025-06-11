@@ -4,7 +4,7 @@
 
 Internet Engineering Task Force (IETF)                        J. Hoyland
 Request for Comments: 0                                       Cloudflare
-Category: Informational                                         May 2025
+Category: Informational                                        June 2025
 ISSN: 2070-1721
 
 
@@ -62,9 +62,9 @@ Table of Contents
      A.1.  Alternative Approaches
        A.1.1.  HTTP Signatures
        A.1.2.  Concealed Auth
-       A.1.3.  Post-handshake authentication (PHA)
+       A.1.3.  Post-handshake Authentication (PHA)
        A.1.4.  ALPN
-       A.1.5.  Client-Initiated Exported authenticators
+       A.1.5.  Client-Initiated Exported Authenticators
    Acknowledgments
    Author's Address
 
@@ -278,10 +278,11 @@ A.1.1.  HTTP Signatures
    verified for every request (rather than one per connection), and
    second that, because the tokens are not bound to the underlying TLS
    connection they can be stolen and replayed.  This is especially
-   problematic in the multi-CDN use case.  If a bot creates a token for
-   a realm that is provided by more than one CDN then the CDN that
-   receives that token can use it to attack any of the other CDNs.  This
-   means that all CDNs are required to trust each other.
+   problematic in the multi-CDN ("Content Distribution Network") use
+   case.  If a bot creates a token for a realm that is provided by more
+   than one CDN then the CDN that receives that token can use it to
+   attack any of the other CDNs.  This means that all CDNs are required
+   to trust each other.
 
 A.1.2.  Concealed Auth
 
@@ -289,8 +290,8 @@ A.1.2.  Concealed Auth
    HTTP layer that cryptographically binds a public key to the
    underlying TLS connection.  This gives us a similar authentication
    property to using request_client_auth, and is also client initiated.
-   This solution is applicable in some contexts, but in the case of
-   authenticating bots may be difficult to implement.
+   This solution is applicable in some contexts, but may be difficult to
+   implement.
 
    The way many HTTP libraries work is that they dispatch requests to a
    connection pool.  Once the request arrives at the pool it is sent on
@@ -303,12 +304,12 @@ A.1.2.  Concealed Auth
    header on the first request of each connection.  Where modifying the
    implementation is not possible various ad-hoc solutions can be used
    such as sending a special "pre-request" on each connection that's
-   added to a pool, however these solutions tend to be bespoke per
+   added to a pool.  However these solutions tend to be bespoke per
    library and bring a number of their own issues (e.g. handling servers
    that terminate connections after a single request, or handling
    resumption).
 
-A.1.3.  Post-handshake authentication (PHA)
+A.1.3.  Post-handshake Authentication (PHA)
 
    Post-handshake authentication is part of the core TLS 1.3 RFC,
    although it is not widely supported.  Its use incurs an extra round-
@@ -333,7 +334,7 @@ A.1.4.  ALPN
    has the downside of the edge case where the server selecting h2+bot
    but not sending a CertificateRequest.
 
-A.1.5.  Client-Initiated Exported authenticators
+A.1.5.  Client-Initiated Exported Authenticators
 
    Exported Authenticators [RFC9261] allow clients to provide
    certificates at the application layer once the connection is
