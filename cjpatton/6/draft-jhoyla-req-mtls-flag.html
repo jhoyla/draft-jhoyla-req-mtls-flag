@@ -1289,14 +1289,17 @@ connection anticipating a "certificate_required" alert. Appropriate cases where
 a client would preemptively terminate the connection include where the
 <code>CertificateRequest</code> includes a <code>certificate_authorities</code> extension or
 <code>signature_algorithms</code> extension that the client cannot satisfy.<a href="#section-3-3" class="pilcrow">¶</a></p>
-<p id="section-3-4">A server <span class="bcp14">MUST NOT</span> set the <code>request_client_auth</code> flag in the
+<p id="section-3-4">Clients that set this flag <span class="bcp14">SHOULD</span> only do so when a client certificate is
+directly available to them, and <span class="bcp14">MUST NOT</span> prompt the user or take actions that
+would prompt the user to provide a certificate.<a href="#section-3-4" class="pilcrow">¶</a></p>
+<p id="section-3-5">A server <span class="bcp14">MUST NOT</span> set the <code>request_client_auth</code> flag in the
 <code>CertificateRequest</code> unless it received the flag in the <code>ClientHello</code>. A client
 receiving the <code>request_client_auth</code> flag that did not set it in the
-<code>ClientHello</code> <span class="bcp14">MUST</span> generate a fatal <code>illegal_parameter</code> alert.<a href="#section-3-4" class="pilcrow">¶</a></p>
-<p id="section-3-5">A client that receives this flag in any message other than <code>CertificateRequest</code>
+<code>ClientHello</code> <span class="bcp14">MUST</span> generate a fatal <code>illegal_parameter</code> alert.<a href="#section-3-5" class="pilcrow">¶</a></p>
+<p id="section-3-6">A client that receives this flag in any message other than <code>CertificateRequest</code>
         <span class="bcp14">MUST</span> terminate the connection with a fatal <code>illegal_parameter</code> alert. Similarly
 a server that receives this flag in any message other than <code>ClientHello</code> <span class="bcp14">MUST</span>
-terminate the connection with a fatal <code>illegal_parameter</code> alert.<a href="#section-3-5" class="pilcrow">¶</a></p>
+terminate the connection with a fatal <code>illegal_parameter</code> alert.<a href="#section-3-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">

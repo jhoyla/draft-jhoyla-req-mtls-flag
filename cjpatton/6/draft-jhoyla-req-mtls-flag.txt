@@ -167,6 +167,11 @@ Table of Contents
    CertificateRequest includes a certificate_authorities extension or
    signature_algorithms extension that the client cannot satisfy.
 
+   Clients that set this flag SHOULD only do so when a client
+   certificate is directly available to them, and MUST NOT prompt the
+   user or take actions that would prompt the user to provide a
+   certificate.
+
    A server MUST NOT set the request_client_auth flag in the
    CertificateRequest unless it received the flag in the ClientHello.  A
    client receiving the request_client_auth flag that did not set it in
