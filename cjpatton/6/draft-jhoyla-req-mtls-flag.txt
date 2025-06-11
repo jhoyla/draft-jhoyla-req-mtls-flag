@@ -194,7 +194,7 @@ Table of Contents
 
    However, the use case for which the flag is enabled may entail
    significant changes to how the client selects a certificate and what
-   trust anchor the server uses to validate it.  The use case may also
+   trust anchors the server uses to validate it.  The use case may also
    impact how the server handles application data transmitted over the
    established connection.
 
