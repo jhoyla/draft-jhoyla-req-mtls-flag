@@ -1321,9 +1321,7 @@ certificate grant certain clients access to some resource, the server must take
 care to ensure this access is not also granted to the web crawler.<a href="#section-4-3" class="pilcrow">¶</a></p>
 <p id="section-4-4">When the server accepts the <code>request_client_auth</code> flag, it <span class="bcp14">SHOULD</span> verify the
 certificate against a set of trust anchors that is disjoint from the set of
-trust anchors it uses when the flag is ignored or rejected. Failure to do so
-may result in authenticating a bot when they are not intended to be
-authenticated.<a href="#section-4-4" class="pilcrow">¶</a></p>
+trust anchors it uses when the flag is ignored or rejected.<a href="#section-4-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">

@@ -203,8 +203,7 @@ Table of Contents
    When the server accepts the request_client_auth flag, it SHOULD
    verify the certificate against a set of trust anchors that is
    disjoint from the set of trust anchors it uses when the flag is
-   ignored or rejected.  Failure to do so may result in authenticating a
-   bot when they are not intended to be authenticated.
+   ignored or rejected.
 
 5.  IANA Considerations
 
