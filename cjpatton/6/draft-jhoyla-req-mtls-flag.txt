@@ -206,12 +206,15 @@ Table of Contents
    server must take care to ensure this access is not also granted to
    the web crawler.
 
-   When the server accepts the request_client_auth flag, it SHOULD
-   verify the certificate against a set of trust anchors that is
-   disjoint from the set of trust anchors it uses when the flag is
-   ignored or rejected.  That is, no client certificate should chain up
-   to the both a Certification Authority (CA) used with the flag and a
-   CA used without it.
+   A server that uses one set of trust anchors to verify clients that
+   send req_client_auth and another set of trust anchors to verify other
+   traffic must take care to ensure that the appropriate trust anchors
+   are selected in each case, otherwise it might be possible for a
+   client to incorrectly gain access to resources it should not be able
+   to reach.  If this is a risk in a given deployment a potential
+   mitigation is to ensure that the set of certificates that chain to
+   the bots trust anchors and those that chain to other sets of trust
+   anchors are disjoint.
 
 5.  IANA Considerations
 
