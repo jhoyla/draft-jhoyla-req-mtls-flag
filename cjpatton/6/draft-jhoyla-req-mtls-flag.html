@@ -1231,20 +1231,21 @@ latency sensitive than web crawlers. On the other hand, it may be prudent to
 treat requests from an unknown client with more scrutiny than requests from a
 well-known web-crawler whose behaviour is relatively predictable.<a href="#section-1-5" class="pilcrow">¶</a></p>
 <p id="section-1-6">It is therefore common for web servers to attempt to identify trusted sources
-of traffic so that they can be distinguished between one another, as well as from human users. This dynamic creates an incentive for attackers
-to impersonate trusted sources of automated traffic to the server: to confer
-on themselves whatever accommodations are conferred on trusted sources.
+of traffic so that they can be distinguished between one another, as well as
+from human users. This dynamic creates an incentive for attackers to
+impersonate trusted sources of automated traffic to the server: to confer on
+themselves whatever accommodations are conferred on trusted sources.
 Unfortunately, many of the features used for self-identification are easily
 spoofed <span>[<a href="#I-D.draft-meunier-web-bot-auth-architecture" class="cite xref">I-D.draft-meunier-web-bot-auth-architecture</a>]</span>.<a href="#section-1-6" class="pilcrow">¶</a></p>
-<p id="section-1-7">Reaching the server normally requires first establishing a TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span> connection with it.
-Authentication of the TLS client is sufficient to thwart impersonation attacks, and
-while there are other approaches to solving this problem (see
-<a href="#alternative-approaches" class="auto internal xref">Appendix A.1</a>), authentication at the TLS layer has several
-desirable features for this use case. [[TODO: Address issue #12 and add a
-reference here.]]<a href="#section-1-7" class="pilcrow">¶</a></p>
-<p id="section-1-8">The mechanism specified in this document may be useful for other use cases.
-However, doing so may entail security, privacy, or operational considerations that
-are relevant to these use cases but are not directly addressed here.<a href="#section-1-8" class="pilcrow">¶</a></p>
+<p id="section-1-7">Reaching the server normally requires first establishing a TLS <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>
+connection with it. Authentication of the TLS client is sufficient to thwart
+impersonation attacks, and while there are other approaches to solving this
+problem (see <a href="#alternative-approaches" class="auto internal xref">Appendix A.1</a>), authentication at the TLS layer has
+several desirable features for this use case. [[TODO: Address issue #12 and
+add a reference here.]]<a href="#section-1-7" class="pilcrow">¶</a></p>
+<p id="section-1-8">The mechanism specified in this document may be used for other purposes, but
+doing so may entail security, privacy, or operational considerations that are
+relevant to these use cases but are not directly addressed here.<a href="#section-1-8" class="pilcrow">¶</a></p>
 <p id="section-1-9">In particular, the <code>request_client_auth</code> flag is not intended to be used by web
 browsers or other clients operated directly by human users. Clients that set
 this flag should only do so when a client certificate is directly available to
@@ -1317,14 +1318,16 @@ gracefully. Because the server acknowledges the flag in the
 changes to how the client selects a certificate and what trust anchors the
 server uses to validate it. The use case may also impact how the server handles
 application data transmitted over the established connection.<a href="#section-4-2" class="pilcrow">¶</a></p>
-<p id="section-4-3">In the case of identifying web crawlers (see <a href="#introduction" class="auto internal xref">Section 1</a>), a web server
-would largely handle traffic from a web crawler as if it were any
-unauthenticated client. If for instance the server already requests a
-certificate to grant certain clients access to some resource, the server must take
-care to ensure this access is not also granted to the web crawler.<a href="#section-4-3" class="pilcrow">¶</a></p>
+<p id="section-4-3">In the case of identifying web crawlers (<a href="#introduction" class="auto internal xref">Section 1</a>), a web server would
+largely handle traffic from a web crawler as if it were any unauthenticated
+client. If for instance the server already requests a certificate to grant
+certain clients access to some resource, the server must take care to ensure
+this access is not also granted to the web crawler.<a href="#section-4-3" class="pilcrow">¶</a></p>
 <p id="section-4-4">When the server accepts the <code>request_client_auth</code> flag, it <span class="bcp14">SHOULD</span> verify the
 certificate against a set of trust anchors that is disjoint from the set of
-trust anchors it uses when the flag is ignored or rejected.<a href="#section-4-4" class="pilcrow">¶</a></p>
+trust anchors it uses when the flag is ignored or rejected. That is, no client
+certificate should chain up to the both a Certification Authority (CA) used
+with the flag and a CA used without it.<a href="#section-4-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
