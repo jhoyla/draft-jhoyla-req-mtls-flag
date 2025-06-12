@@ -92,7 +92,7 @@ Table of Contents
    terminating the connection, and, if unable to authenticate, by
    sending an empty Certificate message, per [RFC8446], Section 4.4.2.
 
-   This mechanism is primarily intended to allow web servers to
+   This mechanism is primarily intended to allow servers to
    cryptographically authenticate web crawlers and other trusted sources
    of automated traffic without prompting human users to present a
    certificate.
@@ -108,23 +108,24 @@ Table of Contents
 
    It is therefore common for web servers to attempt to identify trusted
    sources of traffic so that they can be distinguished between one
-   another and, especially, from human users.  This dynamic creates an
+   another, as well as from human users.  This dynamic creates an
    incentive for attackers to impersonate trusted sources of automated
    traffic to the server: to confer on themselves whatever
    accommodations are conferred on trusted sources.  Unfortunately, many
    of the features used for self-identification are easily spoofed
    [I-D.draft-meunier-web-bot-auth-architecture].
 
-   Authentication of the TLS client is sufficient to thwart such
-   attacks, and while there are other approaches to solving this problem
-   (see Appendix A.1), authentication at the TLS layer has several
-   desirable features for this use case.  [[TODO: Address issue #12 and
-   add a reference here.]]
+   Reaching the server normally requires first establishing a TLS
+   [RFC8446] connection with it.  Authentication of the TLS client is
+   sufficient to thwart impersonation attacks, and while there are other
+   approaches to solving this problem (see Appendix A.1), authentication
+   at the TLS layer has several desirable features for this use case.
+   [[TODO: Address issue #12 and add a reference here.]]
 
    The mechanism specified in this document may be useful for other use
-   cases.  However, it may entail security, privacy, or operational
-   considerations that are relevant to these use cases but are not
-   directly addressed here.
+   cases.  However, doing so may entail security, privacy, or
+   operational considerations that are relevant to these use cases but
+   are not directly addressed here.
 
    In particular, the request_client_auth flag is not intended to be
    used by web browsers or other clients operated directly by human
