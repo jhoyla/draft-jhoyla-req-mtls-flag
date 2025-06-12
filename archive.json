@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-10T00:30:37.092850+00:00",
+  "timestamp": "2025-06-12T00:30:23.976923+00:00",
   "repo": "jhoyla/draft-jhoyla-req-mtls-flag",
   "labels": [
     {
@@ -62,7 +62,7 @@
       "labels": [],
       "body": "\"This enables a number of use cases, for example allowing bots to authenticate themselves when mixed in with general traffic.\"\n\nAfter some discussion with you and others seems to indicate that there may be an opinion that \"browsers shouldn't do this\"\n\nIf the intention is truly for \"bot-auth\" should this really be about only bot-auth - and perhaps include being opinionated about what the bot-auth is to perhaps simplify the resulting pki for this? (maybe not just any old X.509 certificate blob with path building etc,  but perhaps something more limited or even a raw public key to encourage dedicated trust stores for this purpose?)\n\nOr is the intention here to be a generic \"it's safe to send me a certificate request\" that browsers/clients/things-not-bots could possibly start using for certain things - and leaving \"bot-auth\" to have to disambiguate the cases (i.e. what trust store to use) on the server by other means if both are in use. \n",
       "createdAt": "2025-03-18T07:49:25Z",
-      "updatedAt": "2025-06-09T18:50:57Z",
+      "updatedAt": "2025-06-10T17:39:11Z",
       "closedAt": null,
       "comments": [
         {
@@ -120,6 +120,41 @@
           "body": "I think this example shows that \"human-in-the-loop\" is not the right way to think of \"bot\". What matters to us I think is what access is granted to the client, not whether the client is human or a bot acting on behalf of a human. See https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/6#issuecomment-2956638120.",
           "createdAt": "2025-06-09T18:50:56Z",
           "updatedAt": "2025-06-09T18:50:56Z"
+        },
+        {
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "body": "So @thibmeu has an interesting definition of a bot for the purposes of HTTP Sigs, which is that \"a bot is something with no expectation of privacy\". I actually really like this framing, because it makes it clear when you should and shouldn't use this, or rather, which identities go in the certificate. If you are an agent acting for some user (I've been using the word [principal](https://en.wikipedia.org/wiki/Principal_(commercial_law)) to capture the idea of the person directing the bot just because I can't think of a better one, suggestions extremely welcome), then whilst the user might have some expectation of privacy, the agent (the controller of the private key) here does not.",
+          "createdAt": "2025-06-10T14:43:31Z",
+          "updatedAt": "2025-06-10T14:43:31Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I don't believe that definition is sufficient for our purposes because it doesn't fully account for how we handle requests from humans versus bots. Privacy is just one facet of this.",
+          "createdAt": "2025-06-10T14:54:46Z",
+          "updatedAt": "2025-06-10T14:55:44Z"
+        },
+        {
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "body": "I'm not convinced that there is any useful definition of a bot beyond defining it as \"not human\". Maybe just privacy isn't sufficient, but I do like framing in terms of \"what rights do humans have that we don't need to honour here\".",
+          "createdAt": "2025-06-10T15:31:22Z",
+          "updatedAt": "2025-06-10T15:31:22Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "That's kind of my point: we don't _need_ to define \"bot\". All we need to define is how we handle traffic from a client that identifies themself as a bot.",
+          "createdAt": "2025-06-10T15:40:25Z",
+          "updatedAt": "2025-06-10T15:40:25Z"
+        },
+        {
+          "author": "bob-beck",
+          "authorAssociation": "NONE",
+          "body": "I agree in that focusing on a definition of a bot is probably tangential, the desired goal is to define what the extension is supposed to be used for and write a useful security concerns section to guide implementors on what they should and should not do with it. \n\n",
+          "createdAt": "2025-06-10T17:39:11Z",
+          "updatedAt": "2025-06-10T17:39:11Z"
         }
       ]
     },
@@ -135,7 +170,7 @@
       "labels": [],
       "body": "This is interesting because even if the flag on its own has no security impact, the use case we intend to support here -- web bot auth -- certainly does. Namely, we have to override the logic the server uses to decide whether to send a CertificateRequest, how to select a trust anchor to validate the Certificate, and how to handle application data. We don't want to authorize HTTP requests from a crawler that would otherwise require a different client identity.\r\n\r\nGiven the WG feedback so far, I think we'll need to discuss this here. If you'd rather do it in a separate PR, then feel free to just leave a TODO here.\r\n\r\n_Originally posted by @cjpatton in https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/4#discussion_r2114816776_\r\n            ",
       "createdAt": "2025-05-30T14:15:26Z",
-      "updatedAt": "2025-06-09T18:44:40Z",
+      "updatedAt": "2025-06-11T18:49:31Z",
       "closedAt": null,
       "comments": [
         {
@@ -172,6 +207,27 @@
           "body": "Agreed. To me the definition of bot auth is most relevant to (or even _only relevant to_?) how we treat application data. Namely, we treat the TLS client as if it were an unauthenticated TLS client, except the server might bypass some security measure applied to unauthenticated TLS clients. For instance, we want to rate limit clients _pretending_ to be GoogleBot, but not GoogleBot itself.\n\n@jhoyla has been thinking about this for a lot longer than me and perhaps has a more precise definition in mind!",
           "createdAt": "2025-06-09T18:44:39Z",
           "updatedAt": "2025-06-09T18:44:39Z"
+        },
+        {
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "body": "I don't think \"bypass\" is the correct framing here. They are going down an alternative, and IMO _stricter_ path. \n\nBut overall, I think we should say in the security considerations something along the lines of \"If the bot auth flag is accepted then the server should verify the certificate against an appropriate set of trust anchors, which may or may not be disjoint to the set of trust anchors it uses when the flag is ignored or rejected. Failure to do so may result in authenticating a bot when they are not intended to be authenticated.\"",
+          "createdAt": "2025-06-10T15:27:48Z",
+          "updatedAt": "2025-06-10T15:27:48Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> I don't think \"bypass\" is the correct framing here. They are going down an alternative, and IMO _stricter_ path.\n\nAgreed.\n\n> But overall, I think we should say in the security considerations something along the lines of \"If the bot auth flag is accepted then the server should verify the certificate against an appropriate set of trust anchors, which may or may not be disjoint to the set of trust anchors it uses when the flag is ignored or rejected. Failure to do so may result in authenticating a bot when they are not intended to be authenticated.\"\n\nI'm mostly on board with this, but I would want to recommend against mixing trust anchors (\"may not be disjoint\").",
+          "createdAt": "2025-06-10T15:43:37Z",
+          "updatedAt": "2025-06-10T15:43:37Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@bob-beck would you mind taking a look at the changes to Security Considerations in this PR: https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/15",
+          "createdAt": "2025-06-11T18:49:31Z",
+          "updatedAt": "2025-06-11T18:49:31Z"
         }
       ]
     },
@@ -180,15 +236,15 @@
       "id": "I_kwDOKjmGVs64_ezi",
       "title": "Compare to using HTTP Signatures for bot auth",
       "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/7",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "cjpatton",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "We're planning to use HTTP Signatures (RFC 9241) for bot authentication: https://github.com/thibmeu/http-message-signatures-directory. This might be inappropriate for some use cases or deployment scenarios. We should help readers decide whether request client auth is more appropriate.\n\nSpecifically, the draft should spell out the potential efficiency issues and security risks of using HTTP signatures for bot authentication and how these might be addressed with authentication at the TLS level.",
       "createdAt": "2025-05-30T16:09:24Z",
-      "updatedAt": "2025-05-30T16:09:24Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-11T13:14:16Z",
+      "closedAt": "2025-06-11T13:14:15Z",
       "comments": []
     },
     {
@@ -196,15 +252,15 @@
       "id": "I_kwDOKjmGVs64_fy8",
       "title": "Add reference to draft-meunier-web-bot-auth-architecture",
       "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/8",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "cjpatton",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "The motivation for this draft is primarily to solve the use cases described in https://datatracker.ietf.org/doc/draft-meunier-web-bot-auth-architecture/. We should add an informational reference to this to the intro.\n\nMore generally, we want to enumerate the use cases which this draft might solve for.",
       "createdAt": "2025-05-30T16:11:34Z",
-      "updatedAt": "2025-05-30T16:20:50Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-11T13:14:15Z",
+      "closedAt": "2025-06-11T13:14:15Z",
       "comments": []
     },
     {
@@ -228,15 +284,15 @@
       "id": "I_kwDOKjmGVs65374k",
       "title": "Compare to concealed auth for HTTP",
       "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/10",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "cjpatton",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Could we use https://datatracker.ietf.org/doc/rfc9729/ to bind requests to the TLS channel? Does this work in practice for our main case of bot auth?",
       "createdAt": "2025-06-04T16:41:53Z",
-      "updatedAt": "2025-06-05T10:07:08Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-11T13:14:15Z",
+      "closedAt": "2025-06-11T13:14:15Z",
       "comments": [
         {
           "author": "jhoyla",
@@ -244,6 +300,51 @@
           "body": "We tried this initially, but it doesn't play nicely with connection pooling. We tried several different HTTP libraries, and we found that most require you to create a request and dispatch it to the connection pool, whereupon the pool decides which connection it will go on. In some libraries/scenarios the connection isn't even established until the request has been dispatched. This makes constructing the signature very difficult because you can't reliably get the appropriate TLS exporter. At small scale it's possible to manage in a few ways, i.e. not using connection pooling, using callbacks to modify the request after the connection has been selected, or sending dummy get requests with the appropriate header on every connection that gets added to the pool, but each of these has very significant drawbacks when you scale past a few connections. ",
           "createdAt": "2025-06-05T10:07:07Z",
           "updatedAt": "2025-06-05T10:07:07Z"
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "id": "I_kwDOKjmGVs662zJS",
+      "title": "Operational Considerations: what are the constraints to consider when choosing how to authenticate bots?",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/12",
+      "state": "OPEN",
+      "author": "cjpatton",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Add an operational considerations section that justifies this mechanism from an operational perspective. We talk about this a bit in the new appendix in which we list alternatives (see #11), but we should also provide a list of considerations an implementer can take into account when picking between alternatives. Some ideas I've heard:\n\n1. It's much more efficient than HTTP Signatures for the same application (lower communication, less signing/verification)\n2. X.509 certificates gives the deployment a lot more control over key management \n\nAny other thoughts here @jhoyla and @thibmeu?",
+      "createdAt": "2025-06-10T21:52:40Z",
+      "updatedAt": "2025-06-11T18:56:00Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "thibmeu",
+          "authorAssociation": "NONE",
+          "body": "For 1., I'm not sure the number of signing/verification would be that high of an overhead. The current HTTP Message Sigs for bots draft has an open issue about the topic https://github.com/thibmeu/http-message-signatures-directory/issues/4, and could consider clearly mentioning headers compression mechanism as recommended.\n\nfor 2., JWK sets are different than certificates, but already benefit from a wide deployment as well. Keys _could_ be linked to certificates, as part of x5c/x5t field of JWK for instance. This needs more exploration, as mentioned in https://github.com/thibmeu/http-message-signatures-directory/issues/27.\n\nFor operational considerations, I would add:\n3. Ease of deployment. My initial impression is that TLS is a lower level primitive which tends to have controlled exposure in client/server implementations. I'm not sure what's the best term to convey this idea.\n\nIt'd also be great to identify what are the requirements for specific deployments/applications. For instance, a crawler may have a long running connection, while RAG would be more instantaneous. The overhead is likely different.\n\nIn the end, I think the alternative is for Bots/crawler. If two solutions are provided, origins will end up implementing both.",
+          "createdAt": "2025-06-11T07:25:14Z",
+          "updatedAt": "2025-06-11T07:25:14Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> For 1., I'm not sure the number of signing/verification would be that high of an overhead. The current HTTP Message Sigs for bots draft has an open issue about the topic [thibmeu/http-message-signatures-directory#4](https://github.com/thibmeu/http-message-signatures-directory/issues/4), and could consider clearly mentioning headers compression mechanism as recommended.\n\nHow would headers compression work? If you have to sign each request, then you also have to verify the signature for each request. At the TLS layer we verify just once.\n\nThat said, one could imagine the cost of signing/verifying each request is not really a problem for web bot auth.\n\n\n> For operational considerations, I would add: 3. Ease of deployment. My initial impression is that TLS is a lower level primitive which tends to have controlled exposure in client/server implementations. I'm not sure what's the best term to convey this idea.\n\nGood one to add. Though I'm not sure we can argue this mechanism would be easier to deploy in all situations. If an implementer has more control over the HTTP stack than their TLS stack, some sort of HTTP-based authentication mechanism might well be easier.\n\n\n> It'd also be great to identify what are the requirements for specific deployments/applications. For instance, a crawler may have a long running connection, while RAG would be more instantaneous. The overhead is likely different.\n\nyeah hopefully the web bot auth BoF will flesh this out a little :)\n\n",
+          "createdAt": "2025-06-11T15:11:15Z",
+          "updatedAt": "2025-06-11T15:11:15Z"
+        },
+        {
+          "author": "thibmeu",
+          "authorAssociation": "NONE",
+          "body": "for header compression, I'm thinking of [RFC 7541 HPACK: Header Compression for HTTP/2](https://datatracker.ietf.org/doc/html/rfc7541). The current spec for HTTP Sigs for Bots does not sign request digest, it signs the @authority. This means you can reuse it if the @authority is unchanged and the origins is accepting reuse.",
+          "createdAt": "2025-06-11T15:24:54Z",
+          "updatedAt": "2025-06-11T15:24:54Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Ah, interesting. I believe we were missing that detail, @jhoyla. (This also makes me even more nervous about replay attacks.)",
+          "createdAt": "2025-06-11T18:56:00Z",
+          "updatedAt": "2025-06-11T18:56:00Z"
         }
       ]
     }
@@ -698,24 +799,26 @@
       "id": "PR_kwDOKjmGVs6ZsKKn",
       "title": "Add appendix",
       "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/11",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "jhoyla",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Add appendix discussing alternative solutions.\r\n\r\nCloses #10.\r\nCloses #8.\r\nCloses #7.",
       "createdAt": "2025-06-09T13:55:58Z",
-      "updatedAt": "2025-06-09T16:45:07Z",
+      "updatedAt": "2025-06-11T13:14:14Z",
       "baseRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
       "baseRefName": "main",
       "baseRefOid": "b197cbd30ee01853b1d1a176a0b56a1ab5b5575b",
       "headRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
       "headRefName": "jhoyla/feedback",
-      "headRefOid": "111f03827bb57d973be30303550b1cb2f6d359fe",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "293e077b7f91bea8ce5b8f7e5f5843c882e65c64",
+      "closedAt": "2025-06-11T13:14:14Z",
+      "mergedAt": "2025-06-11T13:14:14Z",
+      "mergedBy": "jhoyla",
+      "mergeCommit": {
+        "oid": "54a43355c9f4fca50046cc9aa3204c790bbd8f1c"
+      },
       "comments": [],
       "reviews": [
         {
@@ -779,6 +882,478 @@
               "updatedAt": "2025-06-09T16:45:07Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6tskeu",
+          "commit": {
+            "abbreviatedOid": "111f038"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-10T15:38:14Z",
+          "updatedAt": "2025-06-10T15:38:14Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "So this is addressed in the next sentence.",
+              "createdAt": "2025-06-10T15:38:14Z",
+              "updatedAt": "2025-06-10T15:38:14Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6tsrwa",
+          "commit": {
+            "abbreviatedOid": "111f038"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-10T15:46:43Z",
+          "updatedAt": "2025-06-10T15:46:43Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "Do you mean this:\r\n\r\n> The way many HTTP libraries work is that they dispatch requests to a connection\r\npool. Once the request arrives at the pool it is sent on a chosen connection\r\ndriven by internal logic. This, unfortunately, makes it difficult to know which\r\nconnection a request will be sent on, and thus to produce the appropriate\r\nsignature.\r\n\r\nThis seems to be about any application that uses a connection pool. Are you suggesting that the use of connection pools is more common for bots than for non-bots?\r\n\r\nWhich reminds me of what we're discussing in https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/3#issuecomment-2959730400: how exactly are we defining bot? Does the definition of bot matter here?",
+              "createdAt": "2025-06-10T15:46:43Z",
+              "updatedAt": "2025-06-10T15:46:43Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6ttXVe",
+          "commit": {
+            "abbreviatedOid": "0473a96"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "\ud83d\udc4d \r\n",
+          "createdAt": "2025-06-10T16:45:56Z",
+          "updatedAt": "2025-06-10T19:18:56Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "I'm not sure it's correct to call it a bearer token. I think of a bearer token as just a shared secret.\r\n```suggestion\r\nmechanism for implementing HTTP authentication. This mechanism suffers from a number of drawbacks, notably that a new\r\n```",
+              "createdAt": "2025-06-10T16:45:57Z",
+              "updatedAt": "2025-06-10T19:18:56Z"
+            },
+            {
+              "originalPosition": 16,
+              "body": "```suggestion\r\nin the multi-CDN (\"Content Distribution Network\") use case. If a bot creates a token for a realm that is provided\r\n```",
+              "createdAt": "2025-06-10T19:14:07Z",
+              "updatedAt": "2025-06-10T19:18:56Z"
+            },
+            {
+              "originalPosition": 40,
+              "body": "```suggestion\r\neach connection that's added to a pool. However these solutions tend to be\r\n```",
+              "createdAt": "2025-06-10T19:15:22Z",
+              "updatedAt": "2025-06-10T19:18:56Z"
+            },
+            {
+              "originalPosition": 28,
+              "body": "I don't see how the next paragraph is about bots specifically: see  but in the case of authenticating bots may be\r\ndifficult to implement.\r\n\r\n```suggestion\r\napplicable in some contexts, but may be\r\ndifficult to implement.\r\n```",
+              "createdAt": "2025-06-10T19:17:22Z",
+              "updatedAt": "2025-06-10T19:18:56Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6twSRC",
+          "commit": {
+            "abbreviatedOid": "0473a96"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-10T21:47:35Z",
+          "updatedAt": "2025-06-10T21:47:36Z",
+          "comments": [
+            {
+              "originalPosition": 45,
+              "body": "nit: consistent title capitalization (or let me know if you're following a convention I'm aware of)\r\n```suggestion\r\n### Post-handshake Authentication (PHA)\r\n```",
+              "createdAt": "2025-06-10T21:47:35Z",
+              "updatedAt": "2025-06-10T21:47:36Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6twSVs",
+          "commit": {
+            "abbreviatedOid": "0473a96"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-10T21:47:48Z",
+          "updatedAt": "2025-06-10T21:47:48Z",
+          "comments": [
+            {
+              "originalPosition": 68,
+              "body": "nit: same as above\r\n```suggestion\r\n### Client-Initiated Exported Authenticators\r\n```",
+              "createdAt": "2025-06-10T21:47:48Z",
+              "updatedAt": "2025-06-10T21:47:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6t3hiq",
+          "commit": {
+            "abbreviatedOid": "0473a96"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-11T12:51:46Z",
+          "updatedAt": "2025-06-11T12:51:46Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "A bearer token is anything that simple possession of grants access, i.e. they are always transferable. It doesn't need to involve a shared secret, it can be, for example a signed blob. ",
+              "createdAt": "2025-06-11T12:51:46Z",
+              "updatedAt": "2025-06-11T12:51:46Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "id": "PR_kwDOKjmGVs6aCabu",
+      "title": "Mostly editorial",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/13",
+      "state": "MERGED",
+      "author": "cjpatton",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Upon reading the draft I wanted to split up some of the bigger paragraphs into smaller ones. I also noticed that we use BCP 14 key words in the intro, before they're defined, and thought we should avoid this.",
+      "createdAt": "2025-06-11T13:47:51Z",
+      "updatedAt": "2025-06-11T18:39:05Z",
+      "baseRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "baseRefName": "main",
+      "baseRefOid": "54a43355c9f4fca50046cc9aa3204c790bbd8f1c",
+      "headRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "headRefName": "cjpatton/editorial",
+      "headRefOid": "97db794a963bed16782c4ee64065216a40c3626f",
+      "closedAt": "2025-06-11T18:39:05Z",
+      "mergedAt": "2025-06-11T18:39:05Z",
+      "mergedBy": "cjpatton",
+      "mergeCommit": {
+        "oid": "ec68e0573e57f8f06f14328a0bddebea0267f1ff"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOKjmGVs6t6-bp",
+          "commit": {
+            "abbreviatedOid": "631d3a5"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-11T16:22:33Z",
+          "updatedAt": "2025-06-11T16:24:05Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "Why make this non-normative?",
+              "createdAt": "2025-06-11T16:22:33Z",
+              "updatedAt": "2025-06-11T16:24:05Z"
+            },
+            {
+              "originalPosition": 23,
+              "body": "I def. think this is a hard requirement.",
+              "createdAt": "2025-06-11T16:23:06Z",
+              "updatedAt": "2025-06-11T16:24:05Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6t7Eh4",
+          "commit": {
+            "abbreviatedOid": "631d3a5"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-11T16:31:55Z",
+          "updatedAt": "2025-06-11T16:31:55Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "because this is section 1 and  we don't introduced the BCP 14 key words until section 2",
+              "createdAt": "2025-06-11T16:31:55Z",
+              "updatedAt": "2025-06-11T16:31:55Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6t7HPq",
+          "commit": {
+            "abbreviatedOid": "631d3a5"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-11T16:35:17Z",
+          "updatedAt": "2025-06-11T16:35:17Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "I don't have an issue with this being normative, my point is that editorially it doesn't make sense to have normative text here.",
+              "createdAt": "2025-06-11T16:35:17Z",
+              "updatedAt": "2025-06-11T16:35:17Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6t7bnP",
+          "commit": {
+            "abbreviatedOid": "631d3a5"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-11T17:04:11Z",
+          "updatedAt": "2025-06-11T17:04:11Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "Ah ok, could you possibly put the normative language in later on then?",
+              "createdAt": "2025-06-11T17:04:11Z",
+              "updatedAt": "2025-06-11T17:04:11Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6t7bv7",
+          "commit": {
+            "abbreviatedOid": "631d3a5"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-06-11T17:04:22Z",
+          "updatedAt": "2025-06-11T17:04:22Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6t8e0v",
+          "commit": {
+            "abbreviatedOid": "631d3a5"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-11T18:38:32Z",
+          "updatedAt": "2025-06-11T18:38:38Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "Done.",
+              "createdAt": "2025-06-11T18:38:32Z",
+              "updatedAt": "2025-06-11T18:38:38Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "id": "PR_kwDOKjmGVs6aCcq1",
+      "title": "Rename to req_bot_auth.",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/14",
+      "state": "OPEN",
+      "author": "jhoyla",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-06-11T13:50:41Z",
+      "updatedAt": "2025-06-11T14:51:01Z",
+      "baseRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "baseRefName": "main",
+      "baseRefOid": "54a43355c9f4fca50046cc9aa3204c790bbd8f1c",
+      "headRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "headRefName": "jhoyla/rename",
+      "headRefOid": "3754c89ee7f06eb9509e9e1b0d0f5e147def3ae8",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOKjmGVs6t4-RH",
+          "commit": {
+            "abbreviatedOid": "3754c89"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "I've put up a #15 that might be a more appropriate first step. Would you mind taking a look?",
+          "createdAt": "2025-06-11T14:06:42Z",
+          "updatedAt": "2025-06-11T14:51:01Z",
+          "comments": [
+            {
+              "originalPosition": 19,
+              "body": "I like the abstract as is. Perhaps just tack on a sentence that says something like \"the primary use case for this mechanism is ...\"",
+              "createdAt": "2025-06-11T14:06:42Z",
+              "updatedAt": "2025-06-11T14:51:01Z"
+            },
+            {
+              "originalPosition": 31,
+              "body": "Can we try to keep lines wrapped at 80 columns?",
+              "createdAt": "2025-06-11T14:07:09Z",
+              "updatedAt": "2025-06-11T14:51:01Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "id": "PR_kwDOKjmGVs6aDGYs",
+      "title": "Address the possibility of the flag introducing authentication bugs in implementations",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/15",
+      "state": "OPEN",
+      "author": "cjpatton",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Partially addresses #3. Describe web bot auth as our primary use case, but still allow for the possibility of using the flag for different use cases. The main purpose of this text is to scope the draft's security considerations to web bot auth.\r\n\r\nCloses #6 by recommending use of a separate set of trust anchors with this extension, which seems easy to enforce for our use case.",
+      "createdAt": "2025-06-11T14:43:22Z",
+      "updatedAt": "2025-06-11T18:48:58Z",
+      "baseRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "baseRefName": "main",
+      "baseRefOid": "ec68e0573e57f8f06f14328a0bddebea0267f1ff",
+      "headRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "headRefName": "cjpatton/6",
+      "headRefOid": "ffd7736d448d175fe0cf69a7cf13658c96978e7b",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Changed base.",
+          "createdAt": "2025-06-11T18:40:47Z",
+          "updatedAt": "2025-06-11T18:40:47Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Fixed a couple of typos.",
+          "createdAt": "2025-06-11T18:48:57Z",
+          "updatedAt": "2025-06-11T18:48:57Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOKjmGVs6t7AJ2",
+          "commit": {
+            "abbreviatedOid": "062efa8"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-11T16:25:10Z",
+          "updatedAt": "2025-06-11T16:31:40Z",
+          "comments": [
+            {
+              "originalPosition": 15,
+              "body": "Based on the feedback we've had, I think we'll only get rough consensus if we restrict this to only the bot use case.",
+              "createdAt": "2025-06-11T16:25:10Z",
+              "updatedAt": "2025-06-11T16:31:40Z"
+            },
+            {
+              "originalPosition": 33,
+              "body": "```suggestion\r\nspoofed {{?I-D.draft-meunier-web-bot-auth-architecture}}.\r\n```\r\nIt's not specifically network attackers?",
+              "createdAt": "2025-06-11T16:29:34Z",
+              "updatedAt": "2025-06-11T16:31:40Z"
+            },
+            {
+              "originalPosition": 75,
+              "body": "```suggestion\r\nchanges to how the client selects a certificate and how the server\r\n```\r\nIt doesn't change _how_ the server validates does it? Only what it validates against?",
+              "createdAt": "2025-06-11T16:31:24Z",
+              "updatedAt": "2025-06-11T16:31:40Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6t7NaQ",
+          "commit": {
+            "abbreviatedOid": "2c38ffa"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-11T16:43:13Z",
+          "updatedAt": "2025-06-11T16:44:05Z",
+          "comments": [
+            {
+              "originalPosition": 75,
+              "body": "That's what I mean. Changed to \"which trust anchor the server uses to validate it.\"",
+              "createdAt": "2025-06-11T16:43:13Z",
+              "updatedAt": "2025-06-11T16:44:05Z"
+            },
+            {
+              "originalPosition": 15,
+              "body": "Agreed, but my intention was to leave that to a future to address. That is,this PR merely partially addresses #3, but doesn't close it.",
+              "createdAt": "2025-06-11T16:44:01Z",
+              "updatedAt": "2025-06-11T16:44:05Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6t7eD0",
+          "commit": {
+            "abbreviatedOid": "a1a89a2"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-11T17:06:47Z",
+          "updatedAt": "2025-06-11T17:06:47Z",
+          "comments": [
+            {
+              "originalPosition": 82,
+              "body": "```suggestion\r\ncertificate to grant certain clients access to some resource, the server must take\r\n```",
+              "createdAt": "2025-06-11T17:06:47Z",
+              "updatedAt": "2025-06-11T17:06:47Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6t7eSV",
+          "commit": {
+            "abbreviatedOid": "a1a89a2"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-06-11T17:06:59Z",
+          "updatedAt": "2025-06-11T17:06:59Z",
+          "comments": []
         }
       ]
     }
