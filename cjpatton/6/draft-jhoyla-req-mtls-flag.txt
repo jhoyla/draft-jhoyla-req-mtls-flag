@@ -107,10 +107,10 @@ Table of Contents
    web-crawler whose behaviour is relatively predictable.
 
    It is therefore common for web servers to attempt to identify trusted
-   sources of traffic so that they can be distinguished between one
-   another, as well as from human users.  This dynamic creates an
-   incentive for attackers to impersonate trusted sources of automated
-   traffic to the server: to confer on themselves whatever
+   sources of traffic so that the server can distinguish between them,
+   as well as differentiate them from human users.  This dynamic creates
+   an incentive for attackers to impersonate trusted sources of
+   automated traffic to the server: to confer on themselves whatever
    accommodations are conferred on trusted sources.  Unfortunately, many
    of the features used for self-identification are easily spoofed
    [I-D.draft-meunier-web-bot-auth-architecture].
