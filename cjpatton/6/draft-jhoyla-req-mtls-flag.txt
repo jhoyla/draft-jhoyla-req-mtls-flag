@@ -119,8 +119,8 @@ Table of Contents
    [RFC8446] connection with it.  Authentication of the TLS client is
    sufficient to thwart impersonation attacks, and while there are other
    approaches to solving this problem (see Appendix A.1), authentication
-   at the TLS layer has several desirable features for this use case.
-   [[TODO: Address issue #12 and add a reference here.]]
+   at the TLS layer has several desirable features for this use case,
+   both from a security and operational perspective.
 
    The mechanism specified in this document may be used for other
    purposes, but doing so may entail security, privacy, or operational
