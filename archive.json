@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-12T00:30:23.976923+00:00",
+  "timestamp": "2025-06-15T00:34:29.702792+00:00",
   "repo": "jhoyla/draft-jhoyla-req-mtls-flag",
   "labels": [
     {
@@ -163,15 +163,15 @@
       "id": "I_kwDOKjmGVs64-a8l",
       "title": "Security Considerations: Address risk of making authentication logic more complex",
       "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/6",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "cjpatton",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "This is interesting because even if the flag on its own has no security impact, the use case we intend to support here -- web bot auth -- certainly does. Namely, we have to override the logic the server uses to decide whether to send a CertificateRequest, how to select a trust anchor to validate the Certificate, and how to handle application data. We don't want to authorize HTTP requests from a crawler that would otherwise require a different client identity.\r\n\r\nGiven the WG feedback so far, I think we'll need to discuss this here. If you'd rather do it in a separate PR, then feel free to just leave a TODO here.\r\n\r\n_Originally posted by @cjpatton in https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/4#discussion_r2114816776_\r\n            ",
       "createdAt": "2025-05-30T14:15:26Z",
-      "updatedAt": "2025-06-11T18:49:31Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-13T13:34:08Z",
+      "closedAt": "2025-06-13T13:34:08Z",
       "comments": [
         {
           "author": "cjpatton",
@@ -315,7 +315,7 @@
       "labels": [],
       "body": "Add an operational considerations section that justifies this mechanism from an operational perspective. We talk about this a bit in the new appendix in which we list alternatives (see #11), but we should also provide a list of considerations an implementer can take into account when picking between alternatives. Some ideas I've heard:\n\n1. It's much more efficient than HTTP Signatures for the same application (lower communication, less signing/verification)\n2. X.509 certificates gives the deployment a lot more control over key management \n\nAny other thoughts here @jhoyla and @thibmeu?",
       "createdAt": "2025-06-10T21:52:40Z",
-      "updatedAt": "2025-06-11T18:56:00Z",
+      "updatedAt": "2025-06-13T10:49:01Z",
       "closedAt": null,
       "comments": [
         {
@@ -345,6 +345,104 @@
           "body": "Ah, interesting. I believe we were missing that detail, @jhoyla. (This also makes me even more nervous about replay attacks.)",
           "createdAt": "2025-06-11T18:56:00Z",
           "updatedAt": "2025-06-11T18:56:00Z"
+        },
+        {
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "body": "The overhead for signing/verification is effectively unbounded in the worst case. A connection that involves hundreds or even thousands of requests is going to see a much bigger difference than a connection that sends one request before being torn down.\n\n@cjpatton In HTTP-Signatures the server effectively controls the trade off of replays against efficiency. It can do anything from having a global strike registry to ensure no nonce was ever used before, to allowing tokens with short (or even very short) expiration times to be replayed, to doing no replay checking at all. It can also transition between these policies at a per connection or even a per request level. ",
+          "createdAt": "2025-06-12T12:39:35Z",
+          "updatedAt": "2025-06-12T12:39:35Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Very interesting. It would also be really nice if it could bind to the TLS session :)",
+          "createdAt": "2025-06-12T13:17:35Z",
+          "updatedAt": "2025-06-12T13:17:35Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "4. Proxies: HTTP sigs works in both the forward and reverse proxy case without any trouble. You might be able to make it work for request clien auth, but it depends. (Likewise for concealed auth.) cc @jhoyla ",
+          "createdAt": "2025-06-12T14:48:14Z",
+          "updatedAt": "2025-06-12T14:49:23Z"
+        },
+        {
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "body": "So `request_client_auth` is bound to a particular TLS connection, so can't be proxied. In the case of a reverse proxy, if the proxy has the private key for your website then you already trust it. It's probably reasonable for you to just trust the proxy to honestly report the client certs it sees. For forward proxies `request_client_auth` will only identify the forward proxy, which may be useful in some cases. This actually pairs well with HTTP Sigs. You could use HTTP Sigs to authenticate the principal (i.e. the machine behind the proxy) and `request_client_auth` to authenticate the proxy.",
+          "createdAt": "2025-06-13T10:49:01Z",
+          "updatedAt": "2025-06-13T10:49:01Z"
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "id": "I_kwDOKjmGVs67Lcr0",
+      "title": "Don't refer to `request_client_auth` until it's defined",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/16",
+      "state": "OPEN",
+      "author": "cjpatton",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "request_client_auth has not been introduced yet.\r\nthis may also be a reference to the specific definition section via `{#id}` and `{{id}}`\r\n\r\n```suggestion\r\nIn particular, `request_client_auth` flag, the TLS flag defined in this document, is not intended to be used by web\r\n```\r\n\r\n_Originally posted by @thibmeu in https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/15#discussion_r2141962444_\r\n            ",
+      "createdAt": "2025-06-12T13:38:14Z",
+      "updatedAt": "2025-06-12T13:38:14Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 17,
+      "id": "I_kwDOKjmGVs67V6D_",
+      "title": "Where should the server acknowledge the `req_client_auth` flag?",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/17",
+      "state": "OPEN",
+      "author": "jhoyla",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "There are three places where the server might plausibly acknowledge the flag. The server could acknowledge the flag either in `EncryptedExtensions` (EE), `Certificate` (CT), or in the `CertificateRequest` (CR) message. (There is no reason that the flag should be unencrypted, ruling out SH, HRR is not normally sent, and NST is sent too late.)\n\n# EncryptedExtensions\n\n(+) Putting the flag in the EE is where most flags are likely to be acknowledged. This means there is more likely to be overlap with other TLS Flags (meaning fewer bytes on the wire). \n(-) If the server acknowledges the flag, but chooses to resume the connection (or use an OOB PSK) then it's unclear what the client should do.\n(-) If the server acknowledges the flag but the doesn't send a `CertificateRequest` it's unclear what the client should do.\n\n# Certificate\n\n(+) Cannot be sent if the server resumes the connection (or uses an OOB PSK)\n(-) If the server acknowledges the flag but the doesn't send a `CertificateRequest` it's unclear what the client should do.\n\n# CertificateRequest\n\n(+) The server can only acknowledge the flag at the appropriate time.\n(-) Flags SHOULD be acknowledged in either the SH, EE, or CT messages.\n(-) The server can distinguish between clients that support the flag (but aren't offering it) and those that don't by inappropriately sending the `req_client_auth` flag in its CR message. Clients that support the flag will terminate the connection with an `illegal_parameter` alert, those that don't will ignore it.\n\n\nOne solution is to have the client ignore the flag if it's inappropriately set in the CR message, but this seems against the spirit of the draft.",
+      "createdAt": "2025-06-13T10:23:27Z",
+      "updatedAt": "2025-06-13T10:23:27Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 18,
+      "id": "I_kwDOKjmGVs67YsOH",
+      "title": "Security considerations: The difference between principals and agents",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/18",
+      "state": "OPEN",
+      "author": "cjpatton",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "HTTP sigs is vulnerable to the following attack:\n* Web crawler makes request to CDN1\n* CDN1 replays request to CDN2\n\nWe know that TLS client auth is not vulnerable to the same attack. This might make `request_client_auth` better suited to some use cases.\n\nThe case we want to make is that HTTP sigs is better suited to authenticating the principal, but in the web bot auth use case, it's being used to authenticate the agent. TLS client auth is what you want if you need to authenticate the agent.\n\nThe task is to make this case in security considerations, with examples of principals and agents that motivate the real attacks.",
+      "createdAt": "2025-06-13T14:43:21Z",
+      "updatedAt": "2025-06-13T16:09:12Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "thibmeu",
+          "authorAssociation": "NONE",
+          "body": "You can quote [Section 5.6 of HTTP Sigs for Bots](https://datatracker.ietf.org/doc/html/draft-meunier-web-bot-auth-architecture#name-reverse-proxy-consideration) directly. This is called out in security considerations. If there are improvements to the wording, they could be useful for that draft.",
+          "createdAt": "2025-06-13T15:32:24Z",
+          "updatedAt": "2025-06-13T15:32:24Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Excellent, thanks for the reference!\n",
+          "createdAt": "2025-06-13T15:38:35Z",
+          "updatedAt": "2025-06-13T15:38:35Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "What convinced me that this framing makes sense is a connection to the following idea.\n\nMutually authenticated TLS has the nice property that it authenticates a single interaction between the bot and the server. This means that every message sent in that interaction could _only_ be sent in that interaction. \n\nHTTP sigs does not authenticate a single interaction, but possibly many. As a consequence, a message transmitted in one interaction can potentially be replayed in another.\n\nSo how does this idea of matching conversations connect to principals versus agents?\n\nTake the web crawler example. The agent is the actual crawler; the principal is the company building the index. For TLS client auth, the principal would be the CA and the agent would be a party presenting a client cert.\n\nPrincipals have many-to-one interactions with servers. In the web crawler case, the principal's CA cert is used to validate the agent's cert in each handshake.\n\nAgents have one-to-one interactions with servers. In the web crawler case, the agent presents a cert and uses it to sign the handshake.\n\nThe way we're hoping to use HTTP signatures for web bot auth is to authenticate the agent. But because of how the protocol works, we're not authenticating a one-to-one interaction; we're actually authenticating a many-to-one interaction. In other words, the messages sent in this protocol can be replayed to some extent in conversations among other entities in the protocol.\n\nNow, there are likely ways we can get the same property with an HTTP-based authentication mechanism. E.g., we can consider extending HTTP sigs to bind to the TLS session in some way. Of course, this has some downsides, like not being able to proxy signature.",
+          "createdAt": "2025-06-13T16:09:12Z",
+          "updatedAt": "2025-06-13T16:09:12Z"
         }
       ]
     }
@@ -1183,7 +1281,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2025-06-11T13:50:41Z",
-      "updatedAt": "2025-06-11T14:51:01Z",
+      "updatedAt": "2025-06-12T09:39:26Z",
       "baseRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
       "baseRefName": "main",
       "baseRefOid": "54a43355c9f4fca50046cc9aa3204c790bbd8f1c",
@@ -1194,7 +1292,22 @@
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "thibmeu",
+          "authorAssociation": "NONE",
+          "body": "following the comment on #15: should this be `req_bot_auth` or `request_client_auth`?",
+          "createdAt": "2025-06-12T08:57:10Z",
+          "updatedAt": "2025-06-12T08:57:10Z"
+        },
+        {
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "body": "I don't think we've reached a consensus on which we should go with. There's a fairly long discussion in Issue #3.",
+          "createdAt": "2025-06-12T09:39:26Z",
+          "updatedAt": "2025-06-12T09:39:26Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOKjmGVs6t4-RH",
@@ -1229,24 +1342,26 @@
       "id": "PR_kwDOKjmGVs6aDGYs",
       "title": "Address the possibility of the flag introducing authentication bugs in implementations",
       "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/15",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "cjpatton",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Partially addresses #3. Describe web bot auth as our primary use case, but still allow for the possibility of using the flag for different use cases. The main purpose of this text is to scope the draft's security considerations to web bot auth.\r\n\r\nCloses #6 by recommending use of a separate set of trust anchors with this extension, which seems easy to enforce for our use case.",
       "createdAt": "2025-06-11T14:43:22Z",
-      "updatedAt": "2025-06-11T18:48:58Z",
+      "updatedAt": "2025-06-13T21:57:08Z",
       "baseRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
       "baseRefName": "main",
       "baseRefOid": "ec68e0573e57f8f06f14328a0bddebea0267f1ff",
       "headRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
       "headRefName": "cjpatton/6",
-      "headRefOid": "ffd7736d448d175fe0cf69a7cf13658c96978e7b",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "e454a9bd48be373f9c11c03a9edd5e108f1016e4",
+      "closedAt": "2025-06-13T13:34:07Z",
+      "mergedAt": "2025-06-13T13:34:07Z",
+      "mergedBy": "cjpatton",
+      "mergeCommit": {
+        "oid": "acd2ff65c23f1a1822c21935d8de7373ab64bb80"
+      },
       "comments": [
         {
           "author": "cjpatton",
@@ -1261,6 +1376,34 @@
           "body": "Fixed a couple of typos.",
           "createdAt": "2025-06-11T18:48:57Z",
           "updatedAt": "2025-06-11T18:48:57Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Tweaked the security considerations to match #14 per offline discussion with @jhoyla",
+          "createdAt": "2025-06-12T15:25:46Z",
+          "updatedAt": "2025-06-12T15:25:46Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@jhoyla coments",
+          "createdAt": "2025-06-12T19:08:49Z",
+          "updatedAt": "2025-06-12T19:08:49Z"
+        },
+        {
+          "author": "bob-beck",
+          "authorAssociation": "NONE",
+          "body": "Belatedly mostly looks fine to me, can probably bikeshed some more but let's let others have a kick at the bikeshedding cat ;) ",
+          "createdAt": "2025-06-13T21:07:06Z",
+          "updatedAt": "2025-06-13T21:07:06Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> Belatedly mostly looks fine to me, can probably bikeshed some more but let's let others have a kick at the bikeshedding cat ;)\r\n\r\nWe're happy to take belated feedback! Sorry we merged before you had a chance ... we weren't sure whether you'd have time to review or not.",
+          "createdAt": "2025-06-13T21:57:08Z",
+          "updatedAt": "2025-06-13T21:57:08Z"
         }
       ],
       "reviews": [
@@ -1354,6 +1497,306 @@
           "createdAt": "2025-06-11T17:06:59Z",
           "updatedAt": "2025-06-11T17:06:59Z",
           "comments": []
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6uChhF",
+          "commit": {
+            "abbreviatedOid": "ffd7736"
+          },
+          "author": "thibmeu",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-12T07:37:59Z",
+          "updatedAt": "2025-06-12T07:53:37Z",
+          "comments": [
+            {
+              "originalPosition": 15,
+              "body": "why \"web\" servers?\r\n\r\n```suggestion\r\nThis mechanism is primarily intended to allow servers to cryptographically\r\n```",
+              "createdAt": "2025-06-12T07:37:59Z",
+              "updatedAt": "2025-06-12T07:53:37Z"
+            },
+            {
+              "originalPosition": 29,
+              "body": "slightly changing the wording to make it clear we want to identify each crawler individually, and distinguish them from human users\r\n\r\n```suggestion\r\nof traffic so that they can be distinguished between one another, as well as from human users. This dynamic creates an incentive for attackers\r\n```",
+              "createdAt": "2025-06-12T07:42:02Z",
+              "updatedAt": "2025-06-12T07:53:37Z"
+            },
+            {
+              "originalPosition": 35,
+              "body": "clearly mentioning the assumption that crawlers leverage a TLS client\r\n\r\n```suggestion\r\nReaching the server normally requires first establishing a TLS {{?RFC8446}} connection with it.\r\nAuthentication of the TLS client is sufficient to thwart impersonation attacks, and\r\n```",
+              "createdAt": "2025-06-12T07:44:28Z",
+              "updatedAt": "2025-06-12T13:34:37Z"
+            },
+            {
+              "originalPosition": 41,
+              "body": "```suggestion\r\nThe mechanism specified in this document could be applied to use cases beyond crawler identification.\r\n```",
+              "createdAt": "2025-06-12T07:45:15Z",
+              "updatedAt": "2025-06-12T07:53:37Z"
+            },
+            {
+              "originalPosition": 42,
+              "body": "```suggestion\r\nHowever, doing so may entail security, privacy, or operational considerations that\r\n```",
+              "createdAt": "2025-06-12T07:45:31Z",
+              "updatedAt": "2025-06-12T07:53:37Z"
+            },
+            {
+              "originalPosition": 45,
+              "body": "request_client_auth has not been introduced yet.\r\nthis may also be a reference to the specific definition section via `{#id}` and `{{id}}`\r\n\r\n```suggestion\r\nIn particular, `request_client_auth` flag, the TLS flag defined in this document, is not intended to be used by web\r\n```",
+              "createdAt": "2025-06-12T07:47:56Z",
+              "updatedAt": "2025-06-12T07:53:37Z"
+            },
+            {
+              "originalPosition": 79,
+              "body": "```suggestion\r\nFor the identifying web crawlers use case mentioned in {{introduction}}, a web server\r\n```",
+              "createdAt": "2025-06-12T07:48:46Z",
+              "updatedAt": "2025-06-12T07:53:37Z"
+            },
+            {
+              "originalPosition": 79,
+              "body": "also: you should likely define `{#introduction}`",
+              "createdAt": "2025-06-12T07:49:14Z",
+              "updatedAt": "2025-06-12T07:53:37Z"
+            },
+            {
+              "originalPosition": 87,
+              "body": "not sure this is the right action. my understanding is if a server accepts the flag but does not verify the certificate, there's a high change of misimplementation, and we should recommend to terminate the connection\r\n\r\n```suggestion\r\ntrust anchors it uses when the flag is ignored or rejected. If it does\r\nnot, it is RECOMMENDED to terminate the connection.\r\n```",
+              "createdAt": "2025-06-12T07:51:46Z",
+              "updatedAt": "2025-06-12T07:53:37Z"
+            },
+            {
+              "originalPosition": 56,
+              "body": "would it be relevant to point to security consideration section of TLS flags ? https://datatracker.ietf.org/doc/html/draft-ietf-tls-tlsflags-15#name-security-considerations",
+              "createdAt": "2025-06-12T07:53:34Z",
+              "updatedAt": "2025-06-12T07:53:37Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6uD7Xc",
+          "commit": {
+            "abbreviatedOid": "ffd7736"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-12T09:28:02Z",
+          "updatedAt": "2025-06-12T09:28:02Z",
+          "comments": [
+            {
+              "originalPosition": 87,
+              "body": "So this passage isn't describing what to do if the server can't validate the certificate. This is saying that no certificate should chain up to the both the bot auth CA and the default CA. We should tighten up this language to be clearer. \r\n\r\nW.r.t. your other point one feature of TLS client auth is that if the server doesn't like the certificate then it can silently fallback to a unilaterally authed state. We should preserve that behaviour because that's what's \"expected\".",
+              "createdAt": "2025-06-12T09:28:02Z",
+              "updatedAt": "2025-06-12T09:28:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6uEFpd",
+          "commit": {
+            "abbreviatedOid": "ffd7736"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-12T09:36:07Z",
+          "updatedAt": "2025-06-12T09:36:07Z",
+          "comments": [
+            {
+              "originalPosition": 56,
+              "body": "So the security considerations in the TLS Flags draft apply only to flags acknowledged in `ServerHello` and `HelloRetryRequest`, so don't apply. I was thinking about including a reference to [Section 3](https://datatracker.ietf.org/doc/html/draft-ietf-tls-tlsflags-15#section-3-6) but that doesn't directly apply either, because it assumes flags are only acknowledged in \"HRR, SH, EE, or CT\". I could link the later requirement that invalid flags should terminate the connection, but that feels a bit forced.",
+              "createdAt": "2025-06-12T09:36:07Z",
+              "updatedAt": "2025-06-12T09:36:07Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6uEH-S",
+          "commit": {
+            "abbreviatedOid": "ffd7736"
+          },
+          "author": "thibmeu",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-12T09:39:22Z",
+          "updatedAt": "2025-06-12T09:39:23Z",
+          "comments": [
+            {
+              "originalPosition": 56,
+              "body": "would it make sense to update the wording ofn tls flag draft then?",
+              "createdAt": "2025-06-12T09:39:22Z",
+              "updatedAt": "2025-06-12T09:39:23Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6uEfjK",
+          "commit": {
+            "abbreviatedOid": "ffd7736"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-12T10:11:20Z",
+          "updatedAt": "2025-06-12T10:11:20Z",
+          "comments": [
+            {
+              "originalPosition": 56,
+              "body": "I don't think so? It's not a mistake there, because you can in general send unacknowledged flags in the CR, this flag just has special semantics due to it's structure.",
+              "createdAt": "2025-06-12T10:11:20Z",
+              "updatedAt": "2025-06-12T10:11:20Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6uEgJD",
+          "commit": {
+            "abbreviatedOid": "ffd7736"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-12T10:12:16Z",
+          "updatedAt": "2025-06-12T10:12:16Z",
+          "comments": [
+            {
+              "originalPosition": 56,
+              "body": "Although now I think on it, maybe we should just say \"ignore\" because otherwise we're giving servers a way to detect whether a client understands this draft. A client that ignores the incorrect flag doesn't, one that aborts does. ",
+              "createdAt": "2025-06-12T10:12:16Z",
+              "updatedAt": "2025-06-12T10:12:16Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6uHWXy",
+          "commit": {
+            "abbreviatedOid": "83e92b2"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Thanks guys, I've force-pushed updates to please take a look at the diff since then.",
+          "createdAt": "2025-06-12T13:29:59Z",
+          "updatedAt": "2025-06-12T13:49:22Z",
+          "comments": [
+            {
+              "originalPosition": 15,
+              "body": "You're right, I don't think we need to be this specific.",
+              "createdAt": "2025-06-12T13:29:59Z",
+              "updatedAt": "2025-06-12T13:49:22Z"
+            },
+            {
+              "originalPosition": 35,
+              "body": "I don't think we need to talk specifically about web crawlers. We're also trying to leave room for other types of vaguely defined \"bots\" (though without using the word \"bot\"). I tweaked your suggestion in a way that I think works.",
+              "createdAt": "2025-06-12T13:33:39Z",
+              "updatedAt": "2025-06-12T13:49:22Z"
+            },
+            {
+              "originalPosition": 41,
+              "body": "We don't want to specialize this text to to crawlers (yet).",
+              "createdAt": "2025-06-12T13:35:31Z",
+              "updatedAt": "2025-06-12T13:49:22Z"
+            },
+            {
+              "originalPosition": 42,
+              "body": "Ah, that is niccer gramatically. I'll take this and part of the suggestion above.",
+              "createdAt": "2025-06-12T13:36:11Z",
+              "updatedAt": "2025-06-12T13:49:22Z"
+            },
+            {
+              "originalPosition": 45,
+              "body": "Good call out, but actually it's used in the second paragraph of the intro. I think your argument applies there as well, so let me file this as an editorial issue.",
+              "createdAt": "2025-06-12T13:37:55Z",
+              "updatedAt": "2025-06-12T13:49:22Z"
+            },
+            {
+              "originalPosition": 45,
+              "body": "See https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/16.",
+              "createdAt": "2025-06-12T13:39:04Z",
+              "updatedAt": "2025-06-12T13:49:22Z"
+            },
+            {
+              "originalPosition": 56,
+              "body": "@jhoyla can you create an issue to track this?",
+              "createdAt": "2025-06-12T13:42:57Z",
+              "updatedAt": "2025-06-12T13:49:22Z"
+            },
+            {
+              "originalPosition": 79,
+              "body": "I'm not a fan of this wording, but it's a good idea to make an explicit label. Done.",
+              "createdAt": "2025-06-12T13:43:55Z",
+              "updatedAt": "2025-06-12T13:49:22Z"
+            },
+            {
+              "originalPosition": 87,
+              "body": "Added @jhoyla's suggestion for tightening the language, PTAL.",
+              "createdAt": "2025-06-12T13:48:13Z",
+              "updatedAt": "2025-06-12T13:49:22Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6uKI1C",
+          "commit": {
+            "abbreviatedOid": "562266a"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-06-12T16:26:32Z",
+          "updatedAt": "2025-06-12T16:32:48Z",
+          "comments": [
+            {
+              "originalPosition": 57,
+              "body": "Please put normative SHOULD and MUST NOT for these later in the draft.",
+              "createdAt": "2025-06-12T16:26:33Z",
+              "updatedAt": "2025-06-12T16:32:48Z"
+            },
+            {
+              "originalPosition": 37,
+              "body": "```suggestion\r\nof traffic so that the server can distinguish between them, as well as differentiate them\r\n```",
+              "createdAt": "2025-06-12T16:30:39Z",
+              "updatedAt": "2025-06-12T16:32:48Z"
+            },
+            {
+              "originalPosition": 47,
+              "body": "Please could you add an anchor to the Alternative Approaches section?",
+              "createdAt": "2025-06-12T16:32:40Z",
+              "updatedAt": "2025-06-12T16:32:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6uLfOk",
+          "commit": {
+            "abbreviatedOid": "ce15b1c"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-12T18:41:26Z",
+          "updatedAt": "2025-06-12T18:42:46Z",
+          "comments": [
+            {
+              "originalPosition": 47,
+              "body": "Done.",
+              "createdAt": "2025-06-12T18:41:26Z",
+              "updatedAt": "2025-06-12T18:42:46Z"
+            },
+            {
+              "originalPosition": 57,
+              "body": "Done, in the previous change: https://jhoyla.github.io/draft-jhoyla-req-mtls-flag/draft-jhoyla-req-mtls-flag.html#section-3-4",
+              "createdAt": "2025-06-12T18:41:49Z",
+              "updatedAt": "2025-06-12T18:42:46Z"
+            }
+          ]
         }
       ]
     }
