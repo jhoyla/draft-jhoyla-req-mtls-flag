@@ -193,9 +193,10 @@ Table of Contents
    TLS client authentication is bound to a particular TLS session.  This
    means that a malicious server cannot manipulate a client in such a
    way that they can impersonate said client to any other server.  This
-   is due to the matching sessions property of TLS.
+   is due to the matching sessions property of TLS [DFGS21].
 
-   This differs sharply from e.g. HTTP Signatures, where the receiving
+   This differs sharply from e.g. HTTP Signatures
+   [I-D.draft-meunier-web-bot-auth-architecture], where the receiving
    server can relay a signature header to another server.  In HTTP
    Signatures this is intentional, as it enables the use of proxies.
 
@@ -214,24 +215,29 @@ Table of Contents
    authentication, in the form of a Signature header, to the origin
    server.  Agents, on the other hand, are the immediate participants in
    a protocol.  Each agent in a chain authenticates itself only to its
-   immediate neighbours.
+   direct peers, i.e. those with whom it establishes a TLS connection.
 
    The upside of agent authentication is that it is session-matching,
    i.e. it cannot be replayed.  However that authentication cannot be
-   passed on.  The upside of principal authentication is that it can be
-   passed down an entire chain of agents, and each agent can verify it
-   independently.  However, it suffers from issues with replays.
+   passed on.  The upside of principal authentication is that a single
+   authority (the principal) can create a signature, and even if there
+   is a long chain of proxies, each acting as an independent agent, the
+   signature can be passed from one agent to another, and each agent can
+   verify it independently.  However, it suffers from issues with
+   replays, see Section Appendix A.1.1.
 
    In some cases it might be desirable to have both types of
-   authentication, and in others only one.  TLS client auth provides
-   agent authentication and HTTP Signatures provide principal
-   authentication.  It is possible for both protocols to be set up to
-   provide the other as well, although this requires special deployment
-   considerations.  For example, the TLS Client can be issued with a
-   certificate chain whose leaf provides authentication of the client,
-   and whose CA provides authentication of the principal.  Similarly
-   HTTP Signatures can provide agent authentication by including a
-   binding from the exporter key interface in the signature.
+   authentication, and in others only one.  TLS client authentication
+   provides agent authentication, the client leaf certificate acting to
+   authenticate the agent, and HTTP Signatures provide principal
+   authentication, the signature authenticating the principal.  It is
+   possible for both protocols to be set up to provide the other as
+   well, although this requires special deployment considerations.  For
+   example, the TLS Client can be issued with a certificate chain whose
+   leaf provides authentication of the client, and whose CA provides
+   authentication of the principal.  Similarly HTTP Signatures can
+   provide agent authentication by including a binding from the exporter
+   key interface in the signature.
 
 4.2.  Choice of Trust Anchors
 
@@ -307,6 +313,12 @@ Table of Contents
               on Computer and Communications Security pp. 1773-1788,
               DOI 10.1145/3133956.3134063, October 2017,
               <https://doi.org/10.1145/3133956.3134063>.
+
+   [DFGS21]   Dowling, B., Fischlin, M., Günther, F., and D. Stebila, "A
+              Cryptographic Analysis of the TLS 1.3 Handshake Protocol",
+              Springer Science and Business Media LLC, Journal of
+              Cryptology vol. 34, no. 4, DOI 10.1007/s00145-021-09384-1,
+              July 2021, <https://doi.org/10.1007/s00145-021-09384-1>.
 
    [I-D.draft-meunier-web-bot-auth-architecture]
               Meunier, T., "HTTP Message Signatures for automated

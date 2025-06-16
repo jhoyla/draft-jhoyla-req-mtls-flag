@@ -1324,9 +1324,10 @@ terminate the connection with a fatal <code>illegal_parameter</code> alert.<a hr
 <p id="section-4.1-1">TLS client authentication is bound to a particular TLS session. This means that
 a malicious server cannot manipulate a client in such a way that they can
 impersonate said client to any other server. This is due to the matching
-sessions property of TLS.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
-<p id="section-4.1-2">This differs sharply from e.g. HTTP Signatures, where the receiving server can
-relay a signature header to another server. In HTTP Signatures this is
+sessions property of TLS <span>[<a href="#DFGS21" class="cite xref">DFGS21</a>]</span>.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-2">This differs sharply from e.g. HTTP Signatures
+<span>[<a href="#I-D.draft-meunier-web-bot-auth-architecture" class="cite xref">I-D.draft-meunier-web-bot-auth-architecture</a>]</span>, where the receiving server
+can relay a signature header to another server. In HTTP Signatures this is
 intentional, as it enables the use of proxies.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
 <p id="section-4.1-3">This is because they authenticate different things. TLS client authentication
 identifies the actor you are talking to directly, whereas HTTP signatures
@@ -1337,23 +1338,27 @@ authentication" and "agent authentication". Principals are the initiators of a
 particular sequence of actions. It is expected for their authentication
 information to be proxied from agent to agent as the relevant actions play out.
 For example a crawler might request a webpage from a CDN, and the CDN may relay
-the crawler's authentication, in the form of a <code>Signature</code> header, to the origin
-server. Agents, on the other hand, are the immediate participants in a protocol.
-Each agent in a chain authenticates itself only to its immediate neighbours.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+the crawler's authentication, in the form of a <code>Signature</code> header, to the
+origin server. Agents, on the other hand, are the immediate participants in a
+protocol. Each agent in a chain authenticates itself only to its direct peers,
+i.e. those with whom it establishes a TLS connection.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
 <p id="section-4.1-5">The upside of agent authentication is that it is session-matching, i.e. it
 cannot be replayed. However that authentication cannot be passed on. The upside
-of principal authentication is that it can be passed down an entire chain of
-agents, and each agent can verify it independently. However, it suffers from
-issues with replays.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
-<p id="section-4.1-6">In some cases it might be desirable to have both types of authentication, and in
-others only one. TLS client auth provides agent authentication and HTTP
-Signatures provide principal authentication. It is possible for both protocols
-to be set up to provide the other as well, although this requires special
-deployment considerations. For example, the TLS Client can be issued with a
-certificate chain whose leaf provides authentication of the client, and whose CA
-provides authentication of the principal. Similarly HTTP Signatures can provide
-agent authentication by including a binding from the exporter key interface in
-the signature.<a href="#section-4.1-6" class="pilcrow">¶</a></p>
+of principal authentication is that a single authority (the principal) can
+create a signature, and even if there is a long chain of proxies, each acting
+as an independent agent, the signature can be passed from one agent to another,
+and each agent can verify it independently. However, it suffers from issues
+with replays, see Section <a href="#http-sigs" class="auto internal xref">Appendix A.1.1</a>.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
+<p id="section-4.1-6">In some cases it might be desirable to have both types of authentication, and
+in others only one. TLS client authentication provides agent authentication,
+the client leaf certificate acting to authenticate the agent, and HTTP
+Signatures provide principal authentication, the signature authenticating the
+principal. It is possible for both protocols to be set up to provide the other
+as well, although this requires special deployment considerations. For example,
+the TLS Client can be issued with a certificate chain whose leaf provides
+authentication of the client, and whose CA provides authentication of the
+principal. Similarly HTTP Signatures can provide agent authentication by
+including a binding from the exporter key interface in the signature.<a href="#section-4.1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="choice-of-trust-anchors">
@@ -1450,6 +1455,10 @@ TLS namespace with the following values:<a href="#section-5-1" class="pilcrow">�
         <dd>
 <span class="refAuthor">Cremers, C.</span>, <span class="refAuthor">Horvat, M.</span>, <span class="refAuthor">Hoyland, J.</span>, <span class="refAuthor">Scott, S.</span>, and <span class="refAuthor">T. van der Merwe</span>, <span class="refTitle">"A Comprehensive Symbolic Analysis of TLS 1.3"</span>, <span class="refContent">ACM</span>, <span class="seriesInfo">Proceedings of the 2017 ACM SIGSAC Conference on Computer and Communications Security pp. 1773-1788</span>, <span class="seriesInfo">DOI 10.1145/3133956.3134063</span>, <time datetime="2017-10" class="refDate">October 2017</time>, <span>&lt;<a href="https://doi.org/10.1145/3133956.3134063">https://doi.org/10.1145/3133956.3134063</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="DFGS21">[DFGS21]</dt>
+        <dd>
+<span class="refAuthor">Dowling, B.</span>, <span class="refAuthor">Fischlin, M.</span>, <span class="refAuthor">Günther, F.</span>, and <span class="refAuthor">D. Stebila</span>, <span class="refTitle">"A Cryptographic Analysis of the TLS 1.3 Handshake Protocol"</span>, <span class="refContent">Springer Science and Business Media LLC</span>, <span class="seriesInfo">Journal of Cryptology vol. 34, no. 4</span>, <span class="seriesInfo">DOI 10.1007/s00145-021-09384-1</span>, <time datetime="2021-07" class="refDate">July 2021</time>, <span>&lt;<a href="https://doi.org/10.1007/s00145-021-09384-1">https://doi.org/10.1007/s00145-021-09384-1</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="I-D.draft-meunier-web-bot-auth-architecture">[I-D.draft-meunier-web-bot-auth-architecture]</dt>
         <dd>
 <span class="refAuthor">Meunier, T.</span>, <span class="refTitle">"HTTP Message Signatures for automated traffic Architecture"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-meunier-web-bot-auth-architecture-01</span>, <time datetime="2025-05-07" class="refDate">7 May 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-meunier-web-bot-auth-architecture-01">https://datatracker.ietf.org/doc/html/draft-meunier-web-bot-auth-architecture-01</a>&gt;</span>. </dd>
@@ -1481,7 +1490,7 @@ TLS namespace with the following values:<a href="#section-5-1" class="pilcrow">�
         <h3 id="name-alternative-approaches">
 <a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-alternative-approaches" class="section-name selfRef">Alternative Approaches</a>
         </h3>
-<div id="http-signatures">
+<div id="http-sigs">
 <section id="appendix-A.1.1">
           <h4 id="name-http-signatures">
 <a href="#appendix-A.1.1" class="section-number selfRef">A.1.1. </a><a href="#name-http-signatures" class="section-name selfRef">HTTP Signatures</a>
