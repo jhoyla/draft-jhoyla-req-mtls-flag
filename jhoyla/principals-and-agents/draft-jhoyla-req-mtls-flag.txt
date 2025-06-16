@@ -224,7 +224,7 @@ Table of Contents
    is a long chain of proxies, each acting as an independent agent, the
    signature can be passed from one agent to another, and each agent can
    verify it independently.  However, it suffers from issues with
-   replays, see Section Appendix A.1.1.
+   replays, see Appendix A.1.1.
 
    In some cases it might be desirable to have both types of
    authentication, and in others only one.  TLS client authentication
