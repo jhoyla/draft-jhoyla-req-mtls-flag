@@ -54,7 +54,8 @@ Table of Contents
    2.  Conventions and Definitions
    3.  Flag specification
    4.  Security Considerations
-     4.1.  Principals vs Agents
+     4.1.  Authentication Properties
+     4.2.  Choice of Trust Anchors
    5.  IANA Considerations
    6.  References
      6.1.  Normative References
@@ -187,6 +188,53 @@ Table of Contents
 
 4.  Security Considerations
 
+4.1.  Authentication Properties
+
+   TLS client authentication is bound to a particular TLS session.  This
+   means that a malicious server cannot manipulate a client in such a
+   way that they can impersonate said client to any other server.  This
+   is due to the matching sessions property of TLS.
+
+   This differs sharply from e.g. HTTP Signatures, where the receiving
+   server can relay a signature header to another server.  In HTTP
+   Signatures this is intentional, as it enables the use of proxies.
+
+   This is because they authenticate different things.  TLS client
+   authentication identifies the actor you are talking to directly,
+   whereas HTTP signatures identifies the actor that triggered some
+   request, but not necessarily the actor you are in direct contact
+   with.
+
+   We describe the difference between these two properties as "principal
+   authentication" and "agent authentication".  Principals are the
+   initiators of a particular sequence of actions.  It is expected for
+   their authentication information to be proxied from agent to agent as
+   the relevant actions play out.  For example a crawler might request a
+   webpage from a CDN, and the CDN may relay the crawler's
+   authentication, in the form of a Signature header, to the origin
+   server.  Agents, on the other hand, are the immediate participants in
+   a protocol.  Each agent in a chain authenticates itself only to its
+   immediate neighbours.
+
+   The upside of agent authentication is that it is session-matching,
+   i.e. it cannot be replayed.  However that authentication cannot be
+   passed on.  The upside of principal authentication is that it can be
+   passed down an entire chain of agents, and each agent can verify it
+   independently.  However, it suffers from issues with replays.
+
+   In some cases it might be desirable to have both types of
+   authentication, and in others only one.  TLS client auth provides
+   agent authentication and HTTP Signatures provide principal
+   authentication.  It is possible for both protocols to be set up to
+   provide the other as well, although this requires special deployment
+   considerations.  For example, the TLS Client can be issued with a
+   certificate chain whose leaf provides authentication of the client,
+   and whose CA provides authentication of the principal.  Similarly
+   HTTP Signatures can provide agent authentication by including a
+   binding from the exporter key interface in the signature.
+
+4.2.  Choice of Trust Anchors
+
    On its own, this flag should have no effect on the security of TLS,
    as the server may always send a CertificateRequest message during the
    handshake.  This flag merely provides a hint that the client will
@@ -216,45 +264,6 @@ Table of Contents
    mitigation is to ensure that the set of certificates that chain to
    the bots trust anchors and those that chain to other sets of trust
    anchors are disjoint.
-
-4.1.  Principals vs Agents
-
-   TLS client authentication is bound to a particular TLS session.  This
-   means that a malicious server cannot manipulate a client in such a
-   way that they can impersonate said client to any other server.  This
-   is due to the matching sessions property of TLS.  This, however, does
-   have some downsides.  A server behind a reverse proxy cannot prove to
-   the origin that it saw and appropriately verified a particular
-   client.
-
-   This differs sharply from e.g. HTTP Signatures, where tokens can be
-   passed from actor to actor, and can always be verified.  This is
-   because they authenticate different things.
-
-   We describe the difference between these two properties as "principal
-   authentication" and "agent authentication".  Principals are the
-   initiators of a particular sequence of actions.  It is expected for
-   their authentication information to be passed from agent to agent as
-   the relevant actions play out.  Agents, on the other hand, are the
-   immediate participants in a protocol.  Each agent in a chain
-   authenticates itself only to its immediate neighbours.
-
-   The upside of agent authentication is that it is session-matching,
-   i.e. it cannot be replayed.  However it also cannot be passed on.
-   The upside of principal authentication is that it can be passed
-   through an entire chain of actors, and each actor can verify it
-   independently.  However, it suffers from issues with replays.
-
-   In some cases it might be desirable to have both types of
-   authentication, and in others only one.  TLS client auth provides
-   agent authentication and HTTP Signatures provide principal
-   authentication.  It is possible for both protocols to be set up to
-   provide the other as well, although this requires special deployment
-   considerations.  For example, the TLS Client can be issued with a
-   certificate chain whose leaf provides authentication of the client,
-   and whose CA provides authentication of the principal.  Similarly
-   HTTP Signatures can provide agent authentication by including a
-   binding from the exporter key interface in the signature.
 
 5.  IANA Considerations
 
