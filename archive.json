@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-15T00:34:29.702792+00:00",
+  "timestamp": "2025-06-17T00:30:37.518285+00:00",
   "repo": "jhoyla/draft-jhoyla-req-mtls-flag",
   "labels": [
     {
@@ -1795,6 +1795,259 @@
               "body": "Done, in the previous change: https://jhoyla.github.io/draft-jhoyla-req-mtls-flag/draft-jhoyla-req-mtls-flag.html#section-3-4",
               "createdAt": "2025-06-12T18:41:49Z",
               "updatedAt": "2025-06-12T18:42:46Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 19,
+      "id": "PR_kwDOKjmGVs6as232",
+      "title": "Add text on principals and agents",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/19",
+      "state": "OPEN",
+      "author": "jhoyla",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "This text addresses Issue #18.",
+      "createdAt": "2025-06-16T11:43:38Z",
+      "updatedAt": "2025-06-16T15:57:08Z",
+      "baseRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "baseRefName": "main",
+      "baseRefOid": "acd2ff65c23f1a1822c21935d8de7373ab64bb80",
+      "headRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
+      "headRefName": "jhoyla/principals-and-agents",
+      "headRefOid": "bbc35fe46ee6e32e9eca375dd158b0214e2936b2",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOKjmGVs6uxEM5",
+          "commit": {
+            "abbreviatedOid": "a1aa1c6"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Nice. Just some nits and an idea for framing the text.",
+          "createdAt": "2025-06-16T13:16:37Z",
+          "updatedAt": "2025-06-16T13:31:06Z",
+          "comments": [
+            {
+              "originalPosition": 15,
+              "body": "Give an example of a concrete attack here, e.g. cut-and-paste the multi-CDN example from the alternative-appraoches section.",
+              "createdAt": "2025-06-16T13:16:37Z",
+              "updatedAt": "2025-06-16T13:31:06Z"
+            },
+            {
+              "originalPosition": 20,
+              "body": "\"from agent to agent\": What do you mean here? Can you give an example?",
+              "createdAt": "2025-06-16T13:22:44Z",
+              "updatedAt": "2025-06-16T13:31:06Z"
+            },
+            {
+              "originalPosition": 4,
+              "body": "Not a great title IMO, as \"principal\" and \"agent\" aren't' defined yet.\r\n\r\nI actually had something else in mind for this text. Tell me what you think about this. I think we have two main goals, the first to describe the intended security properties of request client auth, and the second to point out the shortcomings of HTTP signatures. (The answer of course is that HTTP sigs authenticates the principal, not the agent!)\r\n\r\nTherefore I think this text should be the _start_ of the security considerations section. The current text, which gets into considerations for deploying the mechanism, could go in its own subsection. WDYT?\r\n\r\n```suggestion\r\n## Principals vs Agents\r\n```",
+              "createdAt": "2025-06-16T13:27:24Z",
+              "updatedAt": "2025-06-16T13:31:06Z"
+            },
+            {
+              "originalPosition": 25,
+              "body": "Why would someone want to pass \"it\" on? Is this the reverse/forward proxy case?\r\n\r\nbit: Also, what is \"it\"? \"authentication of the agent\"?",
+              "createdAt": "2025-06-16T13:29:05Z",
+              "updatedAt": "2025-06-16T13:31:06Z"
+            },
+            {
+              "originalPosition": 26,
+              "body": "\"entire chain of actors\": for example? I'm wary about introducing too many hypotheticals.\r\n\r\nnit: If by \"actor\" you mean \"agent\", then let's say \"agent\" to avoid using too many words for the same thing.\r\n\r\n",
+              "createdAt": "2025-06-16T13:30:08Z",
+              "updatedAt": "2025-06-16T13:31:06Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6uyJbQ",
+          "commit": {
+            "abbreviatedOid": "3c2e2c6"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-16T14:29:17Z",
+          "updatedAt": "2025-06-16T14:37:16Z",
+          "comments": [
+            {
+              "originalPosition": 54,
+              "body": "nit: extraneous change\r\n```suggestion\r\n```",
+              "createdAt": "2025-06-16T14:29:17Z",
+              "updatedAt": "2025-06-16T14:37:16Z"
+            },
+            {
+              "originalPosition": 9,
+              "body": "let's add an informative reference for \"matching sessions property of TLS\"? https://eprint.iacr.org/2020/1044 comes to mind, but pick your favorite :)",
+              "createdAt": "2025-06-16T14:30:45Z",
+              "updatedAt": "2025-06-16T14:37:16Z"
+            },
+            {
+              "originalPosition": 13,
+              "body": "```suggestion\r\nintentional, as it easy to implement in the presence of an HTTP proxy.\r\n```",
+              "createdAt": "2025-06-16T14:32:57Z",
+              "updatedAt": "2025-06-16T14:37:16Z"
+            },
+            {
+              "originalPosition": 21,
+              "body": "Do we have an informative reference for \"principal\" versus \"agent\" authentication?:",
+              "createdAt": "2025-06-16T14:33:36Z",
+              "updatedAt": "2025-06-16T14:37:16Z"
+            },
+            {
+              "originalPosition": 27,
+              "body": "I still think the concept of \"immediate neighbors\" is a little vague. ",
+              "createdAt": "2025-06-16T14:34:24Z",
+              "updatedAt": "2025-06-16T14:37:16Z"
+            },
+            {
+              "originalPosition": 11,
+              "body": "Is this the first reference to HTTP signatures? If so, add a reference to @thibmeu's draft here.",
+              "createdAt": "2025-06-16T14:34:46Z",
+              "updatedAt": "2025-06-16T14:37:16Z"
+            },
+            {
+              "originalPosition": 32,
+              "body": "\"chain of agents\": see https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/19#discussion_r2150017380",
+              "createdAt": "2025-06-16T14:36:01Z",
+              "updatedAt": "2025-06-16T14:37:16Z"
+            },
+            {
+              "originalPosition": 37,
+              "body": "We need to explain who is the principal and who is the agent ini TLS client auth.\r\n\r\nAlso, nit: don't shorten authentication to auth\r\n```suggestion\r\nothers only one. TLS client authentication provides agent authentication and HTTP\r\nSignatures provide principal authentication. It is possible for both protocols\r\n```",
+              "createdAt": "2025-06-16T14:37:00Z",
+              "updatedAt": "2025-06-16T14:37:16Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6uyT-j",
+          "commit": {
+            "abbreviatedOid": "3c2e2c6"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-16T14:40:35Z",
+          "updatedAt": "2025-06-16T14:40:35Z",
+          "comments": [
+            {
+              "originalPosition": 13,
+              "body": "This changes the meaning. The point is specifically contrasting the fact that it is possible to use HTTP Sigs in the presence of a proxy, but that it is not possible in the case of client auth. The ease of implementation is a red herring.",
+              "createdAt": "2025-06-16T14:40:35Z",
+              "updatedAt": "2025-06-16T14:40:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6uyVHC",
+          "commit": {
+            "abbreviatedOid": "3c2e2c6"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-16T14:41:21Z",
+          "updatedAt": "2025-06-16T14:41:21Z",
+          "comments": [
+            {
+              "originalPosition": 21,
+              "body": "No, although it would be great to find one. I've found a few other projects that use the word principal, but none that use it in precisely this sense.",
+              "createdAt": "2025-06-16T14:41:21Z",
+              "updatedAt": "2025-06-16T14:41:22Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6uyW7k",
+          "commit": {
+            "abbreviatedOid": "3c2e2c6"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-16T14:43:15Z",
+          "updatedAt": "2025-06-16T14:43:15Z",
+          "comments": [
+            {
+              "originalPosition": 13,
+              "body": "SGTM. Based on our conversation last Friday (or Thursday?) I thought you wanted to leave open the possibility of request client auth being useful even if there's a proxy. I read this as \"if you have an HTTP proxy in the middle, then you're gonna have a bad time\", but I suppose that's a misreading too.",
+              "createdAt": "2025-06-16T14:43:15Z",
+              "updatedAt": "2025-06-16T14:43:16Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6uyXXK",
+          "commit": {
+            "abbreviatedOid": "3c2e2c6"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-16T14:43:46Z",
+          "updatedAt": "2025-06-16T14:43:46Z",
+          "comments": [
+            {
+              "originalPosition": 21,
+              "body": "Ack, that's a bummer.",
+              "createdAt": "2025-06-16T14:43:46Z",
+              "updatedAt": "2025-06-16T14:43:47Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6uybah",
+          "commit": {
+            "abbreviatedOid": "3c2e2c6"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-06-16T14:48:37Z",
+          "updatedAt": "2025-06-16T14:48:38Z",
+          "comments": [
+            {
+              "originalPosition": 13,
+              "body": "So client auth can be useful in the presence of a proxy, but relies on the origin trusting the proxy. This is probably true in the case of a reverse proxy, given that they control your private key, but not necessarily.",
+              "createdAt": "2025-06-16T14:48:37Z",
+              "updatedAt": "2025-06-16T14:48:38Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6uyppn",
+          "commit": {
+            "abbreviatedOid": "674bba8"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "\ud83e\udd86 - let's hold off on merging until @thibmeu's had a chance to review.",
+          "createdAt": "2025-06-16T15:01:14Z",
+          "updatedAt": "2025-06-16T15:03:57Z",
+          "comments": [
+            {
+              "originalPosition": 37,
+              "body": "This would render as \"Section Section XXX\".\r\n```suggestion\r\nwith replays, see {{http-sigs}}.\r\n```",
+              "createdAt": "2025-06-16T15:01:14Z",
+              "updatedAt": "2025-06-16T15:03:57Z"
             }
           ]
         }
