@@ -54,14 +54,16 @@ Table of Contents
    2.  Conventions and Definitions
    3.  Flag specification
    4.  Security Considerations
+     4.1.  Authentication Properties
+     4.2.  Choice of Trust Anchors
    5.  IANA Considerations
    6.  References
      6.1.  Normative References
      6.2.  Informative References
    Appendix A.  Appendix
      A.1.  Alternative Approaches
-       A.1.1.  HTTP Signatures
-       A.1.2.  Concealed Auth
+       A.1.1.  HTTP Signatures for Web Bot Authentication
+       A.1.2.  Concealed Authentication
        A.1.3.  Post-handshake Authentication (PHA)
        A.1.4.  ALPN
        A.1.5.  Client-Initiated Exported Authenticators
@@ -186,6 +188,60 @@ Table of Contents
 
 4.  Security Considerations
 
+4.1.  Authentication Properties
+
+   TLS client authentication is bound to a particular TLS session.  This
+   means that a malicious server cannot manipulate a client in such a
+   way that they can impersonate said client to any other server.  This
+   is due to the matching sessions property of TLS [DFGS21].
+
+   This differs sharply from e.g. HTTP Signatures for Web Bot
+   Authentication (HSWBA) [I-D.draft-meunier-web-bot-auth-architecture],
+   where the receiving server can relay a signature header to another
+   server.  In HSWBA this is intentional, as it enables the use of
+   proxies.
+
+   This is because they authenticate different things.  TLS client
+   authentication identifies the actor you are talking to directly,
+   whereas HSWBA identifies the actor that triggered some request, but
+   not necessarily the actor you are in direct contact with.
+
+   We describe the difference between these two properties as "principal
+   authentication" and "agent authentication".  Principals are the
+   initiators of a particular sequence of actions.  It is expected for
+   their authentication information to be proxied from agent to agent as
+   the relevant actions play out.  For example a crawler might request a
+   webpage from a CDN, and the CDN may relay the crawler's
+   authentication, in the form of a Signature header, to the origin
+   server.  Agents, on the other hand, are the immediate participants in
+   a protocol.  Each agent in a chain authenticates itself only to its
+   direct peers, i.e. those with whom it establishes a TLS connection.
+
+   The upside of agent authentication is that it is session-matching,
+   i.e. it cannot be replayed.  However that authentication cannot be
+   passed on.  The upside of principal authentication is that a single
+   authority (the principal) can create a signature, and even if there
+   is a long chain of proxies, each acting as an independent agent, the
+   signature can be passed from one agent to another, and each agent can
+   verify it independently.  However, it suffers from issues with
+   replays, see Appendix A.1.1.
+
+   In some cases it might be desirable to have both types of
+   authentication, and in others only one.  TLS client authentication
+   provides agent authentication, the client leaf certificate acting to
+   authenticate the agent, and HSWBA provide principal authentication,
+   the signature authenticating the principal.  It is possible for both
+   protocols to be set up to provide the other as well, although this
+   requires special deployment considerations.  For example, the TLS
+   Client can be issued with a certificate chain whose leaf provides
+   authentication of the client, and whose CA provides authentication of
+   the principal.  Similarly HSWBA can provide agent authentication by
+   including a binding from the exporter key interface in the signature.
+   This is very similar to the techniques used in Token Binding
+   [RFC8473], although Token Binding is only defined for TLS 1.2.
+
+4.2.  Choice of Trust Anchors
+
    On its own, this flag should have no effect on the security of TLS,
    as the server may always send a CertificateRequest message during the
    handshake.  This flag merely provides a hint that the client will
@@ -259,6 +315,12 @@ Table of Contents
               DOI 10.1145/3133956.3134063, October 2017,
               <https://doi.org/10.1145/3133956.3134063>.
 
+   [DFGS21]   Dowling, B., Fischlin, M., Günther, F., and D. Stebila, "A
+              Cryptographic Analysis of the TLS 1.3 Handshake Protocol",
+              Springer Science and Business Media LLC, Journal of
+              Cryptology vol. 34, no. 4, DOI 10.1007/s00145-021-09384-1,
+              July 2021, <https://doi.org/10.1007/s00145-021-09384-1>.
+
    [I-D.draft-meunier-web-bot-auth-architecture]
               Meunier, T., "HTTP Message Signatures for automated
               traffic Architecture", Work in Progress, Internet-Draft,
@@ -269,6 +331,11 @@ Table of Contents
    [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
               Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
               <https://www.rfc-editor.org/rfc/rfc8446>.
+
+   [RFC8473]  Popov, A., Nystroem, M., Balfanz, D., Ed., Harper, N., and
+              J. Hodges, "Token Binding over HTTP", RFC 8473,
+              DOI 10.17487/RFC8473, October 2018,
+              <https://www.rfc-editor.org/rfc/rfc8473>.
 
    [RFC9261]  Sullivan, N., "Exported Authenticators in TLS", RFC 9261,
               DOI 10.17487/RFC9261, July 2022,
@@ -283,25 +350,25 @@ Appendix A.  Appendix
 
 A.1.  Alternative Approaches
 
-A.1.1.  HTTP Signatures
+A.1.1.  HTTP Signatures for Web Bot Authentication
 
-   HTTP Signatures [I-D.draft-meunier-web-bot-auth-architecture]
-   describes a mechanism for implementing bearer tokens at the HTTP
-   layer that authenticate requests.  This mechanism suffers from a
-   number of drawbacks, notably that a new signature must be created and
-   verified for every request (rather than one per connection), and
-   second that, because the tokens are not bound to the underlying TLS
-   connection they can be stolen and replayed.  This is especially
-   problematic in the multi-CDN ("Content Distribution Network") use
-   case.  If a bot creates a token for a realm that is provided by more
-   than one CDN then the CDN that receives that token can use it to
-   attack any of the other CDNs.  This means that all CDNs are required
-   to trust each other.
+   HTTP Signatures for Web Bot Authentication
+   [I-D.draft-meunier-web-bot-auth-architecture] describes a mechanism
+   for implementing bearer tokens at the HTTP layer that authenticate
+   requests.  This mechanism suffers from a number of drawbacks, notably
+   that a new signature must be created and verified for every request
+   (rather than one per connection), and second that, because the tokens
+   are not bound to the underlying TLS connection they can be stolen and
+   replayed.  This is especially problematic in the multi-CDN ("Content
+   Distribution Network") use case.  If a bot creates a token for a
+   realm that is provided by more than one CDN then the CDN that
+   receives that token can use it to attack any of the other CDNs.  This
+   means that all CDNs are required to trust each other.
 
-A.1.2.  Concealed Auth
+A.1.2.  Concealed Authentication
 
-   Concealed Auth [RFC9729] allows a client to attach a header at the
-   HTTP layer that cryptographically binds a public key to the
+   Concealed Authentication [RFC9729] allows a client to attach a header
+   at the HTTP layer that cryptographically binds a public key to the
    underlying TLS connection.  This gives us a similar authentication
    property to using request_client_auth, and is also client initiated.
    This solution is applicable in some contexts, but may be difficult to

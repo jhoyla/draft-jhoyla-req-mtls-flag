@@ -16,7 +16,7 @@ this hint.
 <meta content="0" name="rfc.number">
 <!-- Generator version information:
   xml2rfc 3.28.1
-    Python 3.12.10
+    Python 3.12.11
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
@@ -25,7 +25,7 @@ this hint.
     platformdirs 4.3.8
     pycountry 24.6.1
     PyYAML 6.0.2
-    requests 2.32.3
+    requests 2.32.4
     setuptools 80.9.0
     wcwidth 0.2.13
 -->
@@ -1148,6 +1148,14 @@ this hint.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
             <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-authentication-properties" class="internal xref">Authentication Properties</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-choice-of-trust-anchors" class="internal xref">Choice of Trust Anchors</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
             <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
@@ -1170,10 +1178,10 @@ this hint.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
                 <p id="section-toc.1-1.7.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-alternative-approaches" class="internal xref">Alternative Approaches</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1.2.1">
-                    <p id="section-toc.1-1.7.2.1.2.1.1"><a href="#appendix-A.1.1" class="auto internal xref">A.1.1</a>.  <a href="#name-http-signatures" class="internal xref">HTTP Signatures</a></p>
+                    <p id="section-toc.1-1.7.2.1.2.1.1"><a href="#appendix-A.1.1" class="auto internal xref">A.1.1</a>.  <a href="#name-http-signatures-for-web-bot" class="internal xref">HTTP Signatures for Web Bot Authentication</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1.2.2">
-                    <p id="section-toc.1-1.7.2.1.2.2.1"><a href="#appendix-A.1.2" class="auto internal xref">A.1.2</a>.  <a href="#name-concealed-auth" class="internal xref">Concealed Auth</a></p>
+                    <p id="section-toc.1-1.7.2.1.2.2.1"><a href="#appendix-A.1.2" class="auto internal xref">A.1.2</a>.  <a href="#name-concealed-authentication" class="internal xref">Concealed Authentication</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1.2.3">
                     <p id="section-toc.1-1.7.2.1.2.3.1"><a href="#appendix-A.1.3" class="auto internal xref">A.1.3</a>.  <a href="#name-post-handshake-authenticati" class="internal xref">Post-handshake Authentication (PHA)</a></p>
@@ -1308,29 +1316,82 @@ terminate the connection with a fatal <code>illegal_parameter</code> alert.<a hr
       <h2 id="name-security-considerations">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-4-1">On its own, this flag should have no effect on the security of TLS, as the
+<div id="authentication-properties">
+<section id="section-4.1">
+        <h3 id="name-authentication-properties">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-authentication-properties" class="section-name selfRef">Authentication Properties</a>
+        </h3>
+<p id="section-4.1-1">TLS client authentication is bound to a particular TLS session. This means that
+a malicious server cannot manipulate a client in such a way that they can
+impersonate said client to any other server. This is due to the matching
+sessions property of TLS <span>[<a href="#DFGS21" class="cite xref">DFGS21</a>]</span>.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-2">This differs sharply from e.g. HTTP Signatures for Web Bot Authentication
+(HSWBA) <span>[<a href="#I-D.draft-meunier-web-bot-auth-architecture" class="cite xref">I-D.draft-meunier-web-bot-auth-architecture</a>]</span>, where the receiving
+server can relay a signature header to another server. In HSWBA this is
+intentional, as it enables the use of proxies.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1-3">This is because they authenticate different things. TLS client authentication
+identifies the actor you are talking to directly, whereas HSWBA identifies the
+actor that triggered some request, but not necessarily the actor you are in
+direct contact with.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.1-4">We describe the difference between these two properties as "principal
+authentication" and "agent authentication". Principals are the initiators of a
+particular sequence of actions. It is expected for their authentication
+information to be proxied from agent to agent as the relevant actions play out.
+For example a crawler might request a webpage from a CDN, and the CDN may relay
+the crawler's authentication, in the form of a <code>Signature</code> header, to the
+origin server. Agents, on the other hand, are the immediate participants in a
+protocol. Each agent in a chain authenticates itself only to its direct peers,
+i.e. those with whom it establishes a TLS connection.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+<p id="section-4.1-5">The upside of agent authentication is that it is session-matching, i.e. it
+cannot be replayed. However that authentication cannot be passed on. The upside
+of principal authentication is that a single authority (the principal) can
+create a signature, and even if there is a long chain of proxies, each acting
+as an independent agent, the signature can be passed from one agent to another,
+and each agent can verify it independently. However, it suffers from issues
+with replays, see <a href="#http-sigs" class="auto internal xref">Appendix A.1.1</a>.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
+<p id="section-4.1-6">In some cases it might be desirable to have both types of authentication, and
+in others only one. TLS client authentication provides agent authentication,
+the client leaf certificate acting to authenticate the agent, and HSWBA provide
+principal authentication, the signature authenticating the principal. It is
+possible for both protocols to be set up to provide the other as well, although
+this requires special deployment considerations. For example, the TLS Client
+can be issued with a certificate chain whose leaf provides authentication of
+the client, and whose CA provides authentication of the principal. Similarly
+HSWBA can provide agent authentication by including a binding from the exporter
+key interface in the signature. This is very similar to the techniques used in
+Token Binding <span>[<a href="#RFC8473" class="cite xref">RFC8473</a>]</span>, although Token Binding is only defined for TLS 1.2.<a href="#section-4.1-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="choice-of-trust-anchors">
+<section id="section-4.2">
+        <h3 id="name-choice-of-trust-anchors">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-choice-of-trust-anchors" class="section-name selfRef">Choice of Trust Anchors</a>
+        </h3>
+<p id="section-4.2-1">On its own, this flag should have no effect on the security of TLS, as the
 server may always send a <code>CertificateRequest</code> message during the handshake.
 This flag merely provides a hint that the client will handle the request
 gracefully. Because the server acknowledges the flag in the
 <code>CertificateRequest</code> the client can always be sure whether a
-<code>CertificateRequest</code> was triggered by <code>request_client_auth</code> or not.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">However, the use case for which the flag is enabled may entail significant
+<code>CertificateRequest</code> was triggered by <code>request_client_auth</code> or not.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-2">However, the use case for which the flag is enabled may entail significant
 changes to how the client selects a certificate and what trust anchors the
 server uses to validate it. The use case may also impact how the server handles
-application data transmitted over the established connection.<a href="#section-4-2" class="pilcrow">¶</a></p>
-<p id="section-4-3">In the case of identifying web crawlers (<a href="#introduction" class="auto internal xref">Section 1</a>), a web server would
+application data transmitted over the established connection.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.2-3">In the case of identifying web crawlers (<a href="#introduction" class="auto internal xref">Section 1</a>), a web server would
 largely handle traffic from a web crawler as if it were any unauthenticated
 client. If for instance the server already requests a certificate to grant
 certain clients access to some resource, the server must take care to ensure
-this access is not also granted to the web crawler.<a href="#section-4-3" class="pilcrow">¶</a></p>
-<p id="section-4-4">A server that uses one set of trust anchors to verify clients that send
+this access is not also granted to the web crawler.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.2-4">A server that uses one set of trust anchors to verify clients that send
 <code>req_client_auth</code> and another set of trust anchors to verify other traffic must
 take care to ensure that the appropriate trust anchors are selected in each
 case, otherwise it might be possible for a client to incorrectly gain access to
 resources it should not be able to reach. If this is a risk in a given
 deployment a potential mitigation is to ensure that the set of certificates
 that chain to the bots trust anchors and those that chain to other sets of
-trust anchors are disjoint.<a href="#section-4-4" class="pilcrow">¶</a></p>
+trust anchors are disjoint.<a href="#section-4.2-4" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="iana-considerations">
@@ -1395,6 +1456,10 @@ TLS namespace with the following values:<a href="#section-5-1" class="pilcrow">�
         <dd>
 <span class="refAuthor">Cremers, C.</span>, <span class="refAuthor">Horvat, M.</span>, <span class="refAuthor">Hoyland, J.</span>, <span class="refAuthor">Scott, S.</span>, and <span class="refAuthor">T. van der Merwe</span>, <span class="refTitle">"A Comprehensive Symbolic Analysis of TLS 1.3"</span>, <span class="refContent">ACM</span>, <span class="seriesInfo">Proceedings of the 2017 ACM SIGSAC Conference on Computer and Communications Security pp. 1773-1788</span>, <span class="seriesInfo">DOI 10.1145/3133956.3134063</span>, <time datetime="2017-10" class="refDate">October 2017</time>, <span>&lt;<a href="https://doi.org/10.1145/3133956.3134063">https://doi.org/10.1145/3133956.3134063</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="DFGS21">[DFGS21]</dt>
+        <dd>
+<span class="refAuthor">Dowling, B.</span>, <span class="refAuthor">Fischlin, M.</span>, <span class="refAuthor">Günther, F.</span>, and <span class="refAuthor">D. Stebila</span>, <span class="refTitle">"A Cryptographic Analysis of the TLS 1.3 Handshake Protocol"</span>, <span class="refContent">Springer Science and Business Media LLC</span>, <span class="seriesInfo">Journal of Cryptology vol. 34, no. 4</span>, <span class="seriesInfo">DOI 10.1007/s00145-021-09384-1</span>, <time datetime="2021-07" class="refDate">July 2021</time>, <span>&lt;<a href="https://doi.org/10.1007/s00145-021-09384-1">https://doi.org/10.1007/s00145-021-09384-1</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="I-D.draft-meunier-web-bot-auth-architecture">[I-D.draft-meunier-web-bot-auth-architecture]</dt>
         <dd>
 <span class="refAuthor">Meunier, T.</span>, <span class="refTitle">"HTTP Message Signatures for automated traffic Architecture"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-meunier-web-bot-auth-architecture-01</span>, <time datetime="2025-05-07" class="refDate">7 May 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-meunier-web-bot-auth-architecture-01">https://datatracker.ietf.org/doc/html/draft-meunier-web-bot-auth-architecture-01</a>&gt;</span>. </dd>
@@ -1402,6 +1467,10 @@ TLS namespace with the following values:<a href="#section-5-1" class="pilcrow">�
 <dt id="RFC8446">[RFC8446]</dt>
         <dd>
 <span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8446">https://www.rfc-editor.org/rfc/rfc8446</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8473">[RFC8473]</dt>
+        <dd>
+<span class="refAuthor">Popov, A.</span>, <span class="refAuthor">Nystroem, M.</span>, <span class="refAuthor">Balfanz, D., Ed.</span>, <span class="refAuthor">Harper, N.</span>, and <span class="refAuthor">J. Hodges</span>, <span class="refTitle">"Token Binding over HTTP"</span>, <span class="seriesInfo">RFC 8473</span>, <span class="seriesInfo">DOI 10.17487/RFC8473</span>, <time datetime="2018-10" class="refDate">October 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8473">https://www.rfc-editor.org/rfc/rfc8473</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9261">[RFC9261]</dt>
         <dd>
@@ -1426,30 +1495,31 @@ TLS namespace with the following values:<a href="#section-5-1" class="pilcrow">�
         <h3 id="name-alternative-approaches">
 <a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-alternative-approaches" class="section-name selfRef">Alternative Approaches</a>
         </h3>
-<div id="http-signatures">
+<div id="http-sigs">
 <section id="appendix-A.1.1">
-          <h4 id="name-http-signatures">
-<a href="#appendix-A.1.1" class="section-number selfRef">A.1.1. </a><a href="#name-http-signatures" class="section-name selfRef">HTTP Signatures</a>
+          <h4 id="name-http-signatures-for-web-bot">
+<a href="#appendix-A.1.1" class="section-number selfRef">A.1.1. </a><a href="#name-http-signatures-for-web-bot" class="section-name selfRef">HTTP Signatures for Web Bot Authentication</a>
           </h4>
-<p id="appendix-A.1.1-1">HTTP Signatures <span>[<a href="#I-D.draft-meunier-web-bot-auth-architecture" class="cite xref">I-D.draft-meunier-web-bot-auth-architecture</a>]</span> describes a
-mechanism for implementing bearer tokens at the HTTP layer that authenticate
-requests. This mechanism suffers from a number of drawbacks, notably that a new
-signature must be created and verified for every request (rather than one per
-connection), and second that, because the tokens are not bound to the
-underlying TLS connection they can be stolen and replayed. This is especially
-problematic in the multi-CDN ("Content Distribution Network") use case. If a
-bot creates a token for a realm that is provided by more than one CDN then the
-CDN that receives that token can use it to attack any of the other CDNs. This
-means that all CDNs are required to trust each other.<a href="#appendix-A.1.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.1.1-1">HTTP Signatures for Web Bot Authentication
+<span>[<a href="#I-D.draft-meunier-web-bot-auth-architecture" class="cite xref">I-D.draft-meunier-web-bot-auth-architecture</a>]</span> describes a mechanism for
+implementing bearer tokens at the HTTP layer that authenticate requests. This
+mechanism suffers from a number of drawbacks, notably that a new signature must
+be created and verified for every request (rather than one per connection), and
+second that, because the tokens are not bound to the underlying TLS connection
+they can be stolen and replayed. This is especially problematic in the
+multi-CDN ("Content Distribution Network") use case. If a bot creates a token
+for a realm that is provided by more than one CDN then the CDN that receives
+that token can use it to attack any of the other CDNs. This means that all CDNs
+are required to trust each other.<a href="#appendix-A.1.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="concealed-auth">
+<div id="concealed-authentication">
 <section id="appendix-A.1.2">
-          <h4 id="name-concealed-auth">
-<a href="#appendix-A.1.2" class="section-number selfRef">A.1.2. </a><a href="#name-concealed-auth" class="section-name selfRef">Concealed Auth</a>
+          <h4 id="name-concealed-authentication">
+<a href="#appendix-A.1.2" class="section-number selfRef">A.1.2. </a><a href="#name-concealed-authentication" class="section-name selfRef">Concealed Authentication</a>
           </h4>
-<p id="appendix-A.1.2-1">Concealed Auth <span>[<a href="#RFC9729" class="cite xref">RFC9729</a>]</span> allows a client to attach a header at the HTTP
-layer that cryptographically binds a public key to the underlying TLS
+<p id="appendix-A.1.2-1">Concealed Authentication <span>[<a href="#RFC9729" class="cite xref">RFC9729</a>]</span> allows a client to attach a header at the
+HTTP layer that cryptographically binds a public key to the underlying TLS
 connection. This gives us a similar authentication property to using
 <code>request_client_auth</code>, and is also client initiated. This solution is
 applicable in some contexts, but may be difficult to implement.<a href="#appendix-A.1.2-1" class="pilcrow">¶</a></p>
