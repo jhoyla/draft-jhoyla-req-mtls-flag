@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-17T00:30:37.518285+00:00",
+  "timestamp": "2025-06-19T00:30:58.678908+00:00",
   "repo": "jhoyla/draft-jhoyla-req-mtls-flag",
   "labels": [
     {
@@ -413,15 +413,15 @@
       "id": "I_kwDOKjmGVs67YsOH",
       "title": "Security considerations: The difference between principals and agents",
       "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/18",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "cjpatton",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "HTTP sigs is vulnerable to the following attack:\n* Web crawler makes request to CDN1\n* CDN1 replays request to CDN2\n\nWe know that TLS client auth is not vulnerable to the same attack. This might make `request_client_auth` better suited to some use cases.\n\nThe case we want to make is that HTTP sigs is better suited to authenticating the principal, but in the web bot auth use case, it's being used to authenticate the agent. TLS client auth is what you want if you need to authenticate the agent.\n\nThe task is to make this case in security considerations, with examples of principals and agents that motivate the real attacks.",
       "createdAt": "2025-06-13T14:43:21Z",
-      "updatedAt": "2025-06-13T16:09:12Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-17T14:21:59Z",
+      "closedAt": "2025-06-17T14:21:59Z",
       "comments": [
         {
           "author": "thibmeu",
@@ -443,6 +443,13 @@
           "body": "What convinced me that this framing makes sense is a connection to the following idea.\n\nMutually authenticated TLS has the nice property that it authenticates a single interaction between the bot and the server. This means that every message sent in that interaction could _only_ be sent in that interaction. \n\nHTTP sigs does not authenticate a single interaction, but possibly many. As a consequence, a message transmitted in one interaction can potentially be replayed in another.\n\nSo how does this idea of matching conversations connect to principals versus agents?\n\nTake the web crawler example. The agent is the actual crawler; the principal is the company building the index. For TLS client auth, the principal would be the CA and the agent would be a party presenting a client cert.\n\nPrincipals have many-to-one interactions with servers. In the web crawler case, the principal's CA cert is used to validate the agent's cert in each handshake.\n\nAgents have one-to-one interactions with servers. In the web crawler case, the agent presents a cert and uses it to sign the handshake.\n\nThe way we're hoping to use HTTP signatures for web bot auth is to authenticate the agent. But because of how the protocol works, we're not authenticating a one-to-one interaction; we're actually authenticating a many-to-one interaction. In other words, the messages sent in this protocol can be replayed to some extent in conversations among other entities in the protocol.\n\nNow, there are likely ways we can get the same property with an HTTP-based authentication mechanism. E.g., we can consider extending HTTP sigs to bind to the TLS session in some way. Of course, this has some downsides, like not being able to proxy signature.",
           "createdAt": "2025-06-13T16:09:12Z",
           "updatedAt": "2025-06-13T16:09:12Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Closed via #19.",
+          "createdAt": "2025-06-17T14:21:59Z",
+          "updatedAt": "2025-06-17T14:21:59Z"
         }
       ]
     }
@@ -1805,24 +1812,26 @@
       "id": "PR_kwDOKjmGVs6as232",
       "title": "Add text on principals and agents",
       "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/19",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "jhoyla",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "This text addresses Issue #18.",
       "createdAt": "2025-06-16T11:43:38Z",
-      "updatedAt": "2025-06-16T15:57:08Z",
+      "updatedAt": "2025-06-17T13:21:21Z",
       "baseRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
       "baseRefName": "main",
       "baseRefOid": "acd2ff65c23f1a1822c21935d8de7373ab64bb80",
       "headRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
       "headRefName": "jhoyla/principals-and-agents",
-      "headRefOid": "bbc35fe46ee6e32e9eca375dd158b0214e2936b2",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "e306acc7f658a3fae9098ee124319488ca443854",
+      "closedAt": "2025-06-17T13:21:21Z",
+      "mergedAt": "2025-06-17T13:21:21Z",
+      "mergedBy": "jhoyla",
+      "mergeCommit": {
+        "oid": "881827b60d158039f0a922fde92cde76a1ca3010"
+      },
       "comments": [],
       "reviews": [
         {
@@ -2050,6 +2059,45 @@
               "updatedAt": "2025-06-16T15:03:57Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6u5g60",
+          "commit": {
+            "abbreviatedOid": "bbc35fe"
+          },
+          "author": "thibmeu",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "Looks ok",
+          "createdAt": "2025-06-17T06:35:53Z",
+          "updatedAt": "2025-06-17T06:43:15Z",
+          "comments": [
+            {
+              "originalPosition": 29,
+              "body": "i really like this section an framing\r\nif you're willing, it would make for a great addition to the glossary and the related consideration discussed https://github.com/thibmeu/draft-meunier-glossary-somehow/issues/5",
+              "createdAt": "2025-06-17T06:35:53Z",
+              "updatedAt": "2025-06-17T06:43:15Z"
+            },
+            {
+              "originalPosition": 48,
+              "body": "probably worth mentioning [RFC 8473 Token Binding over HTTP](https://datatracker.ietf.org/doc/html/rfc8473)",
+              "createdAt": "2025-06-17T06:41:36Z",
+              "updatedAt": "2025-06-17T06:43:15Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOKjmGVs6u-eUG",
+          "commit": {
+            "abbreviatedOid": "d17b162"
+          },
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-06-17T13:09:12Z",
+          "updatedAt": "2025-06-17T13:09:12Z",
+          "comments": []
         }
       ]
     }
