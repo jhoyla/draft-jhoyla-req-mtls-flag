@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-19T00:30:58.678908+00:00",
+  "timestamp": "2025-06-22T00:34:13.447596+00:00",
   "repo": "jhoyla/draft-jhoyla-req-mtls-flag",
   "labels": [
     {
@@ -55,15 +55,15 @@
       "id": "I_kwDOKjmGVs6ufiKv",
       "title": "Should this be \"request-mtls\" or should this be \"request-bot-auth\"?",
       "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/3",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bob-beck",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "\"This enables a number of use cases, for example allowing bots to authenticate themselves when mixed in with general traffic.\"\n\nAfter some discussion with you and others seems to indicate that there may be an opinion that \"browsers shouldn't do this\"\n\nIf the intention is truly for \"bot-auth\" should this really be about only bot-auth - and perhaps include being opinionated about what the bot-auth is to perhaps simplify the resulting pki for this? (maybe not just any old X.509 certificate blob with path building etc,  but perhaps something more limited or even a raw public key to encourage dedicated trust stores for this purpose?)\n\nOr is the intention here to be a generic \"it's safe to send me a certificate request\" that browsers/clients/things-not-bots could possibly start using for certain things - and leaving \"bot-auth\" to have to disambiguate the cases (i.e. what trust store to use) on the server by other means if both are in use. \n",
       "createdAt": "2025-03-18T07:49:25Z",
-      "updatedAt": "2025-06-10T17:39:11Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-19T18:54:40Z",
+      "closedAt": "2025-06-19T18:54:39Z",
       "comments": [
         {
           "author": "jhoyla",
@@ -155,6 +155,13 @@
           "body": "I agree in that focusing on a definition of a bot is probably tangential, the desired goal is to define what the extension is supposed to be used for and write a useful security concerns section to guide implementors on what they should and should not do with it. \n\n",
           "createdAt": "2025-06-10T17:39:11Z",
           "updatedAt": "2025-06-10T17:39:11Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "The semantics we're leaning towards is the extension indicates which PKI the client is part of. This might be broader than a flag indicating use of some \"web bot auth PKI\". And in any case, using a flag to do so sets a bad precedent for others who might want to prompt CR request for other use cases.\n\nAs such I don't think there's anything more to do for this issue.",
+          "createdAt": "2025-06-19T18:54:39Z",
+          "updatedAt": "2025-06-19T18:54:39Z"
         }
       ]
     },
@@ -268,16 +275,24 @@
       "id": "I_kwDOKjmGVs64_nlH",
       "title": "Ensure the flag is safe to enable inadvertently",
       "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/9",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "cjpatton",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "One concern discussed at IETF 123 is that non-bot clients might propose the flag inadvertently. This is in part a question about proper documentation, but we should also take seriously the question of how to make this safe.\n\nOnce we land #4, the protocol will be something like this: if the client proposes the flag and the server acknowledges it, then the server MUST send CertificateRequest with the acknowledgement.\n\nThe risk seems fairly minimal for this protocol, since the client now knows what code path the server has to selected (client auth with or without the flag). Still, we should play out what might go wrong on the client and side and how an implementation can ensure it does the right thing.",
       "createdAt": "2025-05-30T16:28:37Z",
-      "updatedAt": "2025-05-30T16:28:37Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-06-19T18:39:36Z",
+      "closedAt": "2025-06-19T18:39:36Z",
+      "comments": [
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Closing in favor of #21, which is more to the point.",
+          "createdAt": "2025-06-19T18:39:36Z",
+          "updatedAt": "2025-06-19T18:39:36Z"
+        }
+      ]
     },
     {
       "number": 10,
@@ -452,6 +467,38 @@
           "updatedAt": "2025-06-17T14:21:59Z"
         }
       ]
+    },
+    {
+      "number": 20,
+      "id": "I_kwDOKjmGVs68aNfI",
+      "title": "Explanation of client CertificateRequest handling behavior is misleading",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/20",
+      "state": "OPEN",
+      "author": "cjpatton",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "> The behaviour specified in [[RFC8446](https://jhoyla.github.io/draft-jhoyla-req-mtls-flag/draft-jhoyla-req-mtls-flag.html#RFC8446)] for a client that receives a CertificateRequest that it cannot satisfy is to send an empty Certificate message followed by a Finished message. However in practice many clients simply terminate the connection in anticipation of a \"certificate_required\" alert.\n>\n> This behaviour makes it difficult for servers to send CertificateRequest messages in the wild.\n\nThis text suggests that clients terminate the connection because they don't have a certificate. In fact, a web browser might exhibit the observed behavior because it _might_ be able to rustle up a certificate. In this case, the browser would terminate the connection (the observed behaviour), prompt the user to select a certificate, then retry the connection with the selected certificate.\n\nThis text is misleading because it implies a solution that doesn't solve the problem. See #21.",
+      "createdAt": "2025-06-19T17:35:22Z",
+      "updatedAt": "2025-06-19T19:51:39Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 21,
+      "id": "I_kwDOKjmGVs68anmE",
+      "title": "The client should indicate which PKI its certificate belongs to",
+      "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/issues/21",
+      "state": "OPEN",
+      "author": "cjpatton",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The server already has logic for deciding whether to send CertificateRequest (CR) and which CAs to include (if any), and the client already has logic for responding to a CR and selecting a certificate. Negotiating the `request_client_auth` needs to signal to the client and server to bypass all of this logic and do something else.\n\nThis touches a lot of complexity in client and server implementations that the draft hasn't sorted out. A couple of examples:\n\n1. Suppose the client is a bot and offers the flag, and the server requests a CR but doesn't know about web bot auth PKI. The result would be that the client offers a cert the server can't validate, and the server will abort. Ideally, the client would be able to detect the mismatch and send an empty Certificate message instead.\n2. Suppose the client is not a bot but offers the flag for some other use case, and the server acks the flag and knows about web bot auth. It needs some way of discerning what use the case the client's certificate is for so that it can handle application data accordingly.\n\nFrom offline discussions, there are a lot more nasty examples than these. The draft should avoid this complexity.\n\nOne way is to change the protocol such that the extension is only negotiated if the client indicates a PKI that the server knows about. There's a number ways to do this, for instance have the client indicate to the server in its extension request which CA the server should use.",
+      "createdAt": "2025-06-19T18:39:04Z",
+      "updatedAt": "2025-06-19T18:39:04Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -1281,21 +1328,21 @@
       "id": "PR_kwDOKjmGVs6aCcq1",
       "title": "Rename to req_bot_auth.",
       "url": "https://github.com/jhoyla/draft-jhoyla-req-mtls-flag/pull/14",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "jhoyla",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2025-06-11T13:50:41Z",
-      "updatedAt": "2025-06-12T09:39:26Z",
+      "updatedAt": "2025-06-19T18:50:50Z",
       "baseRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
       "baseRefName": "main",
       "baseRefOid": "54a43355c9f4fca50046cc9aa3204c790bbd8f1c",
       "headRepository": "jhoyla/draft-jhoyla-req-mtls-flag",
       "headRefName": "jhoyla/rename",
       "headRefOid": "3754c89ee7f06eb9509e9e1b0d0f5e147def3ae8",
-      "closedAt": null,
+      "closedAt": "2025-06-19T18:50:49Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -1313,6 +1360,13 @@
           "body": "I don't think we've reached a consensus on which we should go with. There's a fairly long discussion in Issue #3.",
           "createdAt": "2025-06-12T09:39:26Z",
           "updatedAt": "2025-06-12T09:39:26Z"
+        },
+        {
+          "author": "cjpatton",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Just renaming the flag isn't going to get us where we want to go, so I'm going to close this.",
+          "createdAt": "2025-06-19T18:50:49Z",
+          "updatedAt": "2025-06-19T18:50:49Z"
         }
       ],
       "reviews": [
